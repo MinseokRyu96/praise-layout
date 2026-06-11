@@ -316,34 +316,6 @@ textarea {
   resize: vertical;
 }
 
-.metric-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.metric-strip div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #eef7f5;
-}
-
-.metric-strip strong {
-  display: block;
-  font-size: 22px;
-  line-height: 1;
-}
-
-.metric-strip span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-}
-
 .song-list {
   display: grid;
   gap: 14px;
@@ -758,13 +730,8 @@ textarea {
   .setlist-form,
   .settings-grid,
   .layout-quick-settings,
-  .song-card-body,
-  .metric-strip {
+  .song-card-body {
     grid-template-columns: 1fr;
-  }
-
-  .metric-strip {
-    width: 100%;
   }
 
   .layout-quick-settings label {

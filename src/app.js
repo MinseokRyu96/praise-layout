@@ -39,9 +39,6 @@ const els = {
   showMeta: document.querySelector("#showMeta"),
   previewCanvas: document.querySelector("#previewCanvas"),
   warningBox: document.querySelector("#warningBox"),
-  enteredMetric: document.querySelector("#enteredMetric"),
-  matchedMetric: document.querySelector("#matchedMetric"),
-  pageMetric: document.querySelector("#pageMetric"),
   fileNameHint: document.querySelector("#fileNameHint"),
 };
 
@@ -179,9 +176,6 @@ function renderPreview() {
     "현재 설정은 악보가 작게 보일 수 있어요. 코드가 복잡한 곡은 A3 1장에 2곡 배치를 추천합니다.";
 
   els.fileNameHint.textContent = getCleanFileName();
-  els.enteredMetric.textContent = state.songs.filter((song) => song.title).length;
-  els.matchedMetric.textContent = state.songs.filter((song) => song.fileId).length;
-  els.pageMetric.textContent = pages.length;
 }
 
 function updatePrintPageRule() {
