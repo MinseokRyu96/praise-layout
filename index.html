@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PraiseLayout</title>
+    <link rel="stylesheet" href="./styles.css?v=16" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#top" aria-label="PraiseLayout home">
+          <span class="brand-mark">PL</span>
+          <span>
+            <strong>PraiseLayout</strong>
+            <small>A3 worship sheet maker</small>
+          </span>
+        </a>
+        <nav class="nav-list" aria-label="주요 메뉴">
+          <a class="active" href="#composer">새 콘티</a>
+          <a href="#songs">곡 입력</a>
+          <a href="#preview">A3 미리보기</a>
+        </nav>
+        <div class="policy-note">
+          업로드한 악보 파일은 사용 권한을 가진 자료여야 하며, 생성 PDF는 팀 내부 사용을 목적으로 합니다.
+        </div>
+      </aside>
+
+      <main id="top" class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">MVP Prototype</p>
+            <h1>찬양 콘티를 A3 출력용 악보로 자동 정리</h1>
+          </div>
+          <div class="top-actions">
+            <button id="saveButton" class="ghost-button" type="button">저장</button>
+            <button id="printButton" class="primary-button" type="button">PDF 다운로드</button>
+          </div>
+        </header>
+
+        <section id="composer" class="panel intro-panel">
+          <div class="composer-main">
+            <div class="setlist-form">
+              <label>
+                콘티명
+                <input id="setlistTitle" type="text" value="주일 2부 예배 찬양 콘티" />
+              </label>
+              <label>
+                예배 날짜
+                <input id="worshipDate" type="date" />
+              </label>
+              <label>
+                곡 수
+                <select id="songCount">
+                  <option value="3">3곡</option>
+                  <option value="4" selected>4곡</option>
+                  <option value="5">5곡</option>
+                  <option value="6">6곡</option>
+                </select>
+              </label>
+            </div>
+            <div class="layout-quick-settings" aria-label="A3 출력 설정">
+              <label>
+                방향
+                <select id="orientation">
+                  <option value="landscape" selected>A3 가로</option>
+                  <option value="portrait">A3 세로</option>
+                </select>
+              </label>
+              <label>
+                장당 곡 수
+                <select id="songsPerPage">
+                  <option value="1">1곡</option>
+                  <option value="2" selected>2곡</option>
+                  <option value="3">3곡</option>
+                  <option value="4">4곡</option>
+                </select>
+              </label>
+              <label>
+                여백
+                <select id="marginMode">
+                  <option value="tight">좁게</option>
+                  <option value="normal" selected>기본</option>
+                  <option value="wide">넓게</option>
+                </select>
+              </label>
+              <label>
+                표시
+                <span class="checkbox-row">
+                  <input id="showMeta" type="checkbox" checked />
+                  제목/흐름
+                </span>
+              </label>
+            </div>
+          </div>
+          <div class="metric-strip" aria-label="콘티 상태">
+            <div>
+              <strong id="enteredMetric">0</strong>
+              <span>곡명 입력</span>
+            </div>
+            <div>
+              <strong id="matchedMetric">0</strong>
+              <span>악보 연결</span>
+            </div>
+            <div>
+              <strong id="pageMetric">0</strong>
+              <span>A3 페이지</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="songs" class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 1</p>
+              <h2>곡 정보 입력</h2>
+            </div>
+          </div>
+          <div id="songList" class="song-list"></div>
+        </section>
+
+        <section id="preview" class="preview-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 2</p>
+              <h2>PDF 미리보기</h2>
+            </div>
+            <span id="fileNameHint" class="file-name-hint"></span>
+          </div>
+          <div id="warningBox" class="warning-box" hidden></div>
+          <div id="previewCanvas" class="preview-canvas" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./src/app.js?v=16"></script>
+  </body>
+</html>

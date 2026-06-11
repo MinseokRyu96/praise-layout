@@ -1,0 +1,21 @@
+{
+  "name": "praise-layout",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PraiseLayout MVP prototype for A3 worship sheet layout generation.",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "node server.js",
+    "preview": "node server.js 4174",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "worship",
+    "setlist",
+    "sheet-music",
+    "a3",
+    "pdf"
+  ],
+  "author": "",
+  "license": "UNLICENSED"
+}
