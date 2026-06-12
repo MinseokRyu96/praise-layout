@@ -72,6 +72,10 @@ function getCleanFileName(extension = "pdf") {
   return `${getCleanBaseName()}.${extension}`;
 }
 
+function getPageHeading() {
+  return [state.setlist.worshipDate, state.setlist.title].filter(Boolean).join("  |  ");
+}
+
 function getSongPages() {
   const perPage = state.layout.songsPerPage;
   const pages = [];
@@ -173,8 +177,11 @@ function renderPreview() {
   els.previewCanvas.innerHTML = pages
     .map(
       (songs) => `
-        <div class="a3-page ${state.layout.orientation} ${state.layout.marginMode} layout-${perPage}">
-          ${songs.map(renderSlot).join("")}
+        <div class="a3-page ${state.layout.orientation} ${state.layout.marginMode}">
+          <div class="a3-page-heading">${escapeHtml(getPageHeading())}</div>
+          <div class="a3-page-body ${state.layout.orientation} layout-${perPage}">
+            ${songs.map(renderSlot).join("")}
+          </div>
         </div>
       `,
     )
@@ -223,11 +230,13 @@ async function renderJpgCanvas(songs) {
   const scale = canvas.width / (isPortrait ? 790 : 1120);
   const margin = getCanvasMargin(scale);
   const gap = 10 * scale;
+  const headingHeight = 28 * scale;
 
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawJpgPageHeading(ctx, canvas.width, margin, headingHeight, scale);
 
-  const rects = getSlotRects(canvas.width, canvas.height, state.layout.songsPerPage, margin, gap);
+  const rects = getSlotRects(canvas.width, canvas.height, state.layout.songsPerPage, margin, gap, headingHeight);
   for (let index = 0; index < songs.length; index += 1) {
     await drawJpgSlot(ctx, songs[index], rects[index], scale);
   }
@@ -244,7 +253,17 @@ function getCanvasMargin(scale) {
   return (margins[state.layout.marginMode] || margins.normal) * scale;
 }
 
-function getSlotRects(width, height, count, margin, gap) {
+function drawJpgPageHeading(ctx, width, margin, height, scale) {
+  ctx.save();
+  ctx.fillStyle = "#182230";
+  ctx.font = `900 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(getPageHeading(), width / 2, margin + height / 2, width - margin * 2);
+  ctx.restore();
+}
+
+function getSlotRects(width, height, count, margin, gap, headingHeight = 0) {
   const isPortrait = state.layout.orientation === "portrait";
   let columns = 1;
   let rows = 1;
@@ -261,7 +280,7 @@ function getSlotRects(width, height, count, margin, gap) {
   }
 
   const innerWidth = width - margin * 2;
-  const innerHeight = height - margin * 2;
+  const innerHeight = height - margin * 2 - headingHeight - gap;
   const slotWidth = (innerWidth - gap * (columns - 1)) / columns;
   const slotHeight = (innerHeight - gap * (rows - 1)) / rows;
   const rects = [];
@@ -271,7 +290,7 @@ function getSlotRects(width, height, count, margin, gap) {
     const row = Math.floor(index / columns);
     rects.push({
       x: margin + column * (slotWidth + gap),
-      y: margin + row * (slotHeight + gap),
+      y: margin + headingHeight + gap + row * (slotHeight + gap),
       width: slotWidth,
       height: slotHeight,
     });
@@ -292,7 +311,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
   let contentHeight = rect.height;
 
   if (state.layout.showMeta) {
-    const metaHeight = 38 * scale;
+    const metaHeight = 32 * scale;
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(rect.x, rect.y, rect.width, metaHeight);
     ctx.strokeStyle = "#edf0f5";
@@ -311,7 +330,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
   const hasFlow = state.layout.showMeta && Boolean(song.flow);
   let flowHeight = 0;
   if (hasFlow) {
-    const flowPadding = 9 * scale;
+    const flowPadding = 8 * scale;
     ctx.font = `800 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
     const lineHeight = 16 * scale;
     const flowLines = getWrappedLines(ctx, song.flow, rect.width - flowPadding * 2, 4);
@@ -319,7 +338,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     contentHeight -= flowHeight;
   }
 
-  const bodyPadding = 8 * scale;
+  const bodyPadding = 4 * scale;
   const frame = {
     x: rect.x + bodyPadding,
     y: contentY + bodyPadding,
@@ -340,7 +359,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.fillStyle = "#111827";
     ctx.font = `800 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
     ctx.textBaseline = "top";
-    drawWrappedText(ctx, song.flow, rect.x + 9 * scale, flowY + 8 * scale, rect.width - 18 * scale, 16 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (16 * scale))));
+    drawWrappedText(ctx, song.flow, rect.x + 8 * scale, flowY + 6 * scale, rect.width - 16 * scale, 16 * scale, Math.max(1, Math.floor((flowHeight - 12 * scale) / (16 * scale))));
   }
 
   ctx.restore();
@@ -370,8 +389,8 @@ function drawImageContain(ctx, image, x, y, width, height) {
 }
 
 function drawFallbackSheet(ctx, frame, scale) {
-  const insetX = frame.width * 0.06;
-  const insetY = frame.height * 0.06;
+  const insetX = frame.width * 0.03;
+  const insetY = frame.height * 0.03;
   const x = frame.x + insetX;
   const y = frame.y + insetY;
   const width = frame.width - insetX * 2;

@@ -411,7 +411,7 @@ textarea {
 
 .sheet-preview-mini {
   display: grid;
-  min-height: 90px;
+  min-height: 132px;
   place-items: center;
   overflow: hidden;
   border: 1px dashed #b9c3d2;
@@ -460,18 +460,18 @@ textarea {
   }
 
   .sheet-preview-mini {
-    min-height: 76px;
+    min-height: 104px;
   }
 
   .sheet-preview-mini img {
-    height: 66px;
+    height: 94px;
   }
 }
 
 .sheet-preview-mini img {
   display: block;
   width: 100%;
-  height: 80px;
+  height: 120px;
   object-fit: contain;
 }
 
@@ -554,13 +554,33 @@ textarea {
 .a3-page {
   width: min(100%, 1120px);
   aspect-ratio: 1.414 / 1;
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #c9d2df;
   background: #ffffff;
   box-shadow: 0 16px 36px rgba(29, 36, 51, 0.12);
+  min-height: 0;
+}
+
+.a3-page-heading {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.a3-page-body {
+  flex: 1 1 auto;
+  display: grid;
+  gap: 8px;
   min-height: 0;
   grid-auto-rows: minmax(0, 1fr);
 }
@@ -623,8 +643,8 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  min-height: 38px;
-  padding: 7px 9px;
+  min-height: 32px;
+  padding: 5px 8px;
   border-bottom: 1px solid #edf0f5;
   color: var(--ink);
   font-size: 13px;
@@ -636,7 +656,7 @@ textarea {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  padding: 8px;
+  padding: 4px;
   color: #8a95a5;
   text-align: center;
 }
@@ -664,7 +684,7 @@ textarea {
   flex: 0 0 auto;
   max-height: var(--flow-max-height, 30%);
   overflow: hidden;
-  padding: 8px 9px;
+  padding: 6px 8px;
   border-top: 1px solid #edf0f5;
   background: #fbfcfe;
   color: #111827;
@@ -676,7 +696,7 @@ textarea {
 
 .sheet-frame .fallback-sheet {
   position: absolute;
-  inset: 6%;
+  inset: 3%;
   min-height: 0;
   border: 1px solid #d5dce7;
   background:
