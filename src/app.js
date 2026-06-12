@@ -7,7 +7,7 @@ const defaultDate = new Date(today.getFullYear(), today.getMonth(), today.getDat
 
 const state = {
   setlist: {
-    title: "주일 2부 예배 찬양 콘티",
+    title: "",
     worshipDate: defaultDate,
     songCount: 4,
   },
@@ -46,7 +46,7 @@ function createSong(index) {
   return {
     id: crypto.randomUUID(),
     order: index + 1,
-    title: sampleTitles[index] || "",
+    title: "",
     flow: "",
     fileId: "",
   };
@@ -133,7 +133,7 @@ function renderSongs() {
           <div class="song-card-body">
             <label class="field-block title-field">
               <span>곡명</span>
-              <input data-field="title" value="${escapeHtml(song.title)}" placeholder="예: 주 은혜임을" />
+              <input data-field="title" value="${escapeHtml(song.title)}" placeholder="예: ${escapeHtml(sampleTitles[song.order - 1] || "곡명")}" />
             </label>
             <label class="field-block flow-field">
               <span>곡 흐름</span>
