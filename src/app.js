@@ -63,9 +63,22 @@ function getFile(song) {
   return state.files.find((file) => file.id === song.fileId);
 }
 
-function getCleanFileName() {
+function getCleanBaseName() {
   const title = state.setlist.title.replace(/[^\uac00-\ud7a3a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "");
-  return `${title || "콘티"}_${state.setlist.worshipDate || "date"}_A3.pdf`;
+  return `${title || "콘티"}_${state.setlist.worshipDate || "date"}_A3`;
+}
+
+function getCleanFileName(extension = "pdf") {
+  return `${getCleanBaseName()}.${extension}`;
+}
+
+function getSongPages() {
+  const perPage = state.layout.songsPerPage;
+  const pages = [];
+  for (let index = 0; index < state.songs.length; index += perPage) {
+    pages.push(state.songs.slice(index, index + perPage));
+  }
+  return pages;
 }
 
 function saveSnapshot() {
@@ -155,10 +168,7 @@ function renderFilePreview(file) {
 function renderPreview() {
   updatePrintPageRule();
   const perPage = state.layout.songsPerPage;
-  const pages = [];
-  for (let index = 0; index < state.songs.length; index += perPage) {
-    pages.push(state.songs.slice(index, index + perPage));
-  }
+  const pages = getSongPages();
 
   els.previewCanvas.innerHTML = pages
     .map(
@@ -176,6 +186,308 @@ function renderPreview() {
     "현재 설정은 악보가 작게 보일 수 있어요. 코드가 복잡한 곡은 A3 1장에 2곡 배치를 추천합니다.";
 
   els.fileNameHint.textContent = getCleanFileName();
+}
+
+async function downloadJpgPages() {
+  renderPreview();
+
+  const button = document.querySelector("#jpgButton");
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "JPG 생성 중";
+
+  try {
+    const pages = getSongPages();
+    for (let index = 0; index < pages.length; index += 1) {
+      const canvas = await renderJpgCanvas(pages[index]);
+      const blob = await canvasToJpgBlob(canvas);
+      const pageSuffix = pages.length > 1 ? `_p${String(index + 1).padStart(2, "0")}` : "";
+      downloadBlob(blob, `${getCleanBaseName()}${pageSuffix}.jpg`);
+      if (pages.length > 1) await wait(180);
+    }
+  } catch (error) {
+    alert("JPG 파일을 만드는 중 문제가 발생했습니다. 악보 이미지를 다시 업로드한 뒤 시도해 주세요.");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+async function renderJpgCanvas(songs) {
+  const isPortrait = state.layout.orientation === "portrait";
+  const canvas = document.createElement("canvas");
+  canvas.width = isPortrait ? 1697 : 2400;
+  canvas.height = isPortrait ? 2400 : 1697;
+
+  const ctx = canvas.getContext("2d");
+  const scale = canvas.width / (isPortrait ? 790 : 1120);
+  const margin = getCanvasMargin(scale);
+  const gap = 10 * scale;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const rects = getSlotRects(canvas.width, canvas.height, state.layout.songsPerPage, margin, gap);
+  for (let index = 0; index < songs.length; index += 1) {
+    await drawJpgSlot(ctx, songs[index], rects[index], scale);
+  }
+
+  return canvas;
+}
+
+function getCanvasMargin(scale) {
+  const margins = {
+    tight: 12,
+    normal: 20,
+    wide: 34,
+  };
+  return (margins[state.layout.marginMode] || margins.normal) * scale;
+}
+
+function getSlotRects(width, height, count, margin, gap) {
+  const isPortrait = state.layout.orientation === "portrait";
+  let columns = 1;
+  let rows = 1;
+
+  if (count === 2) {
+    columns = isPortrait ? 1 : 2;
+    rows = isPortrait ? 2 : 1;
+  } else if (count === 3) {
+    columns = isPortrait ? 1 : 3;
+    rows = isPortrait ? 3 : 1;
+  } else if (count >= 4) {
+    columns = 2;
+    rows = 2;
+  }
+
+  const innerWidth = width - margin * 2;
+  const innerHeight = height - margin * 2;
+  const slotWidth = (innerWidth - gap * (columns - 1)) / columns;
+  const slotHeight = (innerHeight - gap * (rows - 1)) / rows;
+  const rects = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    rects.push({
+      x: margin + column * (slotWidth + gap),
+      y: margin + row * (slotHeight + gap),
+      width: slotWidth,
+      height: slotHeight,
+    });
+  }
+
+  return rects;
+}
+
+async function drawJpgSlot(ctx, song, rect, scale) {
+  ctx.save();
+  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#dfe5ee";
+  ctx.lineWidth = Math.max(1, scale);
+  ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+
+  let contentY = rect.y;
+  let contentHeight = rect.height;
+
+  if (state.layout.showMeta) {
+    const metaHeight = 38 * scale;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(rect.x, rect.y, rect.width, metaHeight);
+    ctx.strokeStyle = "#edf0f5";
+    ctx.beginPath();
+    ctx.moveTo(rect.x, rect.y + metaHeight);
+    ctx.lineTo(rect.x + rect.width, rect.y + metaHeight);
+    ctx.stroke();
+    ctx.fillStyle = "#182230";
+    ctx.font = `900 ${13 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.textBaseline = "middle";
+    drawClampedLine(ctx, `${song.order}. ${song.title || "곡명 없음"}`, rect.x + 9 * scale, rect.y + metaHeight / 2, rect.width - 18 * scale);
+    contentY += metaHeight;
+    contentHeight -= metaHeight;
+  }
+
+  const hasFlow = state.layout.showMeta && Boolean(song.flow);
+  let flowHeight = 0;
+  if (hasFlow) {
+    const flowPadding = 9 * scale;
+    ctx.font = `800 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    const lineHeight = 16 * scale;
+    const flowLines = getWrappedLines(ctx, song.flow, rect.width - flowPadding * 2, 4);
+    flowHeight = Math.min(rect.height * 0.28, flowLines.length * lineHeight + flowPadding * 2);
+    contentHeight -= flowHeight;
+  }
+
+  const bodyPadding = 8 * scale;
+  const frame = {
+    x: rect.x + bodyPadding,
+    y: contentY + bodyPadding,
+    width: rect.width - bodyPadding * 2,
+    height: contentHeight - bodyPadding * 2,
+  };
+  await drawSheetImage(ctx, song, frame, scale);
+
+  if (hasFlow) {
+    const flowY = rect.y + rect.height - flowHeight;
+    ctx.fillStyle = "#fbfcfe";
+    ctx.fillRect(rect.x, flowY, rect.width, flowHeight);
+    ctx.strokeStyle = "#edf0f5";
+    ctx.beginPath();
+    ctx.moveTo(rect.x, flowY);
+    ctx.lineTo(rect.x + rect.width, flowY);
+    ctx.stroke();
+    ctx.fillStyle = "#111827";
+    ctx.font = `800 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.textBaseline = "top";
+    drawWrappedText(ctx, song.flow, rect.x + 9 * scale, flowY + 8 * scale, rect.width - 18 * scale, 16 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (16 * scale))));
+  }
+
+  ctx.restore();
+}
+
+async function drawSheetImage(ctx, song, frame, scale) {
+  const file = getFile(song);
+  if (file?.objectUrl && file.type !== "application/pdf") {
+    const image = await loadImage(file.objectUrl);
+    drawImageContain(ctx, image, frame.x, frame.y, frame.width, frame.height);
+    return;
+  }
+
+  if (file?.type === "application/pdf") {
+    drawCenteredPlaceholder(ctx, `PDF\n${file.name}`, frame, "#bc3b55", scale);
+    return;
+  }
+
+  drawFallbackSheet(ctx, frame, scale);
+}
+
+function drawImageContain(ctx, image, x, y, width, height) {
+  const ratio = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = image.naturalWidth * ratio;
+  const drawHeight = image.naturalHeight * ratio;
+  ctx.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
+}
+
+function drawFallbackSheet(ctx, frame, scale) {
+  const insetX = frame.width * 0.06;
+  const insetY = frame.height * 0.06;
+  const x = frame.x + insetX;
+  const y = frame.y + insetY;
+  const width = frame.width - insetX * 2;
+  const height = frame.height - insetY * 2;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "#d5dce7";
+  ctx.lineWidth = Math.max(1, scale);
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.strokeStyle = "#eef2f6";
+  ctx.lineWidth = Math.max(1, scale);
+  for (let lineY = y + 18 * scale; lineY < y + height; lineY += 18 * scale) {
+    ctx.beginPath();
+    ctx.moveTo(x, lineY);
+    ctx.lineTo(x + width, lineY);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = "rgba(22, 112, 100, 0.18)";
+  ctx.beginPath();
+  ctx.moveTo(x + width * 0.1, y);
+  ctx.lineTo(x + width * 0.1, y + height);
+  ctx.stroke();
+}
+
+function drawCenteredPlaceholder(ctx, text, frame, color, scale) {
+  const lines = text.split("\n");
+  const lineHeight = 18 * scale;
+  ctx.fillStyle = color;
+  ctx.font = `900 ${13 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  lines.forEach((line, index) => {
+    ctx.fillText(line, frame.x + frame.width / 2, frame.y + frame.height / 2 + (index - (lines.length - 1) / 2) * lineHeight, frame.width * 0.86);
+  });
+  ctx.textAlign = "start";
+}
+
+function drawClampedLine(ctx, text, x, y, maxWidth) {
+  let output = text;
+  while (ctx.measureText(output).width > maxWidth && output.length > 1) {
+    output = `${output.slice(0, -2)}…`;
+  }
+  ctx.fillText(output, x, y);
+}
+
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const lines = getWrappedLines(ctx, text, maxWidth, maxLines);
+  lines.forEach((line, index) => {
+    ctx.fillText(line, x, y + index * lineHeight, maxWidth);
+  });
+}
+
+function getWrappedLines(ctx, text, maxWidth, maxLines = 99) {
+  const lines = [];
+  const paragraphs = String(text || "").split(/\n/);
+
+  paragraphs.forEach((paragraph) => {
+    const words = paragraph.split(/\s+/).filter(Boolean);
+    if (!words.length) {
+      lines.push("");
+      return;
+    }
+
+    let line = "";
+    words.forEach((word) => {
+      const next = line ? `${line} ${word}` : word;
+      if (ctx.measureText(next).width <= maxWidth || !line) {
+        line = next;
+      } else {
+        lines.push(line);
+        line = word;
+      }
+    });
+    lines.push(line);
+  });
+
+  if (lines.length <= maxLines) return lines;
+  const trimmed = lines.slice(0, maxLines);
+  trimmed[trimmed.length - 1] = `${trimmed[trimmed.length - 1].replace(/…$/, "")}…`;
+  return trimmed;
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+function canvasToJpgBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not create JPG blob."));
+    }, "image/jpeg", 0.92);
+  });
+}
+
+function downloadBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function updatePrintPageRule() {
@@ -282,6 +594,9 @@ function bindEvents() {
   document.querySelector("#printButton").addEventListener("click", () => {
     renderPreview();
     window.print();
+  });
+  document.querySelector("#jpgButton").addEventListener("click", () => {
+    downloadJpgPages();
   });
 
   document.body.addEventListener("input", (event) => {
