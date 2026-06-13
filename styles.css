@@ -226,6 +226,7 @@ button:disabled {
   border-radius: 14px;
   background: var(--panel);
   box-shadow: var(--shadow);
+  min-width: 0;
 }
 
 .intro-panel {
@@ -238,6 +239,7 @@ button:disabled {
   grid-template-columns: minmax(320px, 1.6fr) minmax(520px, 2fr);
   gap: 12px;
   align-items: end;
+  min-width: 0;
 }
 
 .setlist-form,
@@ -245,6 +247,7 @@ button:disabled {
 .layout-quick-settings {
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .setlist-form {
@@ -261,6 +264,7 @@ label {
   color: #344054;
   font-size: 13px;
   font-weight: 800;
+  min-width: 0;
 }
 
 .intro-panel label {
@@ -295,6 +299,8 @@ input,
 select,
 textarea {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -336,24 +342,14 @@ textarea {
   border-radius: 14px;
   background: #ffffff;
   box-shadow: 0 10px 24px rgba(18, 25, 38, 0.04);
+  min-width: 0;
 }
 
-.song-card-header {
-  grid-column: 1 / -1;
+.song-title-row {
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 12px;
-}
-
-.song-card-header h3 {
-  margin: 0;
-  font-size: 17px;
-}
-
-.song-card-header p {
-  margin: 3px 0 0;
-  color: var(--muted);
-  font-size: 13px;
+  min-width: 0;
 }
 
 .song-index {
@@ -373,6 +369,7 @@ textarea {
   grid-template-columns: minmax(220px, 0.75fr) minmax(320px, 1.25fr);
   gap: 12px;
   align-items: stretch;
+  min-width: 0;
 }
 
 .field-block {
@@ -395,6 +392,10 @@ textarea {
   min-height: 48px;
   font-size: 16px;
   font-weight: 800;
+}
+
+.song-title-row .title-field {
+  flex: 1 1 auto;
 }
 
 .upload-panel {

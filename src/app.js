@@ -136,18 +136,14 @@ function renderSongs() {
       const file = getFile(song);
       return `
         <article class="song-card" data-song-id="${song.id}">
-          <header class="song-card-header">
-            <span class="song-index">${song.order}</span>
-            <div>
-              <h3>${escapeHtml(song.title || "새 곡")}</h3>
-              <p>${file ? "악보가 연결되었습니다." : "곡명과 흐름을 입력하고 악보를 업로드하세요."}</p>
-            </div>
-          </header>
           <div class="song-card-body">
-            <label class="field-block title-field">
-              <span>곡명</span>
-              <input data-field="title" value="${escapeHtml(song.title)}" placeholder="예: ${escapeHtml(sampleTitles[song.order - 1] || "곡명")}" />
-            </label>
+            <div class="song-title-row">
+              <span class="song-index">${song.order}</span>
+              <label class="field-block title-field">
+                <span>곡명</span>
+                <input data-field="title" value="${escapeHtml(song.title)}" placeholder="예: ${escapeHtml(sampleTitles[song.order - 1] || "곡명")}" />
+              </label>
+            </div>
             <label class="field-block flow-field">
               <span>곡 흐름</span>
               <textarea data-field="flow" rows="4" placeholder="예: Intro 2마디 → Verse 1 → Chorus x2 → Bridge → Chorus">${escapeHtml(song.flow)}</textarea>
