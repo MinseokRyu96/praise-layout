@@ -214,13 +214,17 @@ async function downloadJpgPages() {
 
   try {
     const pages = getSongPages();
-    const canvases = [];
+    const downloads = [];
     for (let index = 0; index < pages.length; index += 1) {
-      canvases.push(await renderJpgCanvas(pages[index]));
+      const canvas = await renderJpgCanvas(pages[index]);
+      const blob = await canvasToJpgBlob(canvas);
+      const pageSuffix = pages.length > 1 ? `_p${String(index + 1).padStart(2, "0")}` : "";
+      downloads.push({
+        blob,
+        fileName: `${getCleanBaseName()}${pageSuffix}.jpg`,
+      });
     }
-    const exportCanvas = combineJpgCanvases(canvases);
-    const blob = await canvasToJpgBlob(exportCanvas);
-    downloadBlob(blob, `${getCleanBaseName()}.jpg`);
+    await downloadBlobSequence(downloads);
   } catch (error) {
     alert("JPG 파일을 만드는 중 문제가 발생했습니다. 악보 이미지를 다시 업로드한 뒤 시도해 주세요.");
   } finally {
@@ -251,36 +255,6 @@ async function renderJpgCanvas(songs) {
   }
 
   return canvas;
-}
-
-function combineJpgCanvases(canvases) {
-  if (canvases.length === 1) return canvases[0];
-
-  const gap = 36;
-  const sourceWidth = canvases[0].width;
-  const sourceHeight = canvases.reduce((sum, canvas) => sum + canvas.height, 0) + gap * (canvases.length - 1);
-  const maxHeight = 8192;
-  const scale = Math.min(1, maxHeight / sourceHeight);
-  const output = document.createElement("canvas");
-  output.width = Math.round(sourceWidth * scale);
-  output.height = Math.round(sourceHeight * scale);
-
-  const ctx = output.getContext("2d");
-  ctx.fillStyle = "#f6f8fb";
-  ctx.fillRect(0, 0, output.width, output.height);
-
-  let y = 0;
-  canvases.forEach((canvas) => {
-    const width = Math.round(canvas.width * scale);
-    const height = Math.round(canvas.height * scale);
-    ctx.drawImage(canvas, 0, y, width, height);
-    ctx.strokeStyle = "#d6dde8";
-    ctx.lineWidth = Math.max(1, Math.round(scale));
-    ctx.strokeRect(0.5, y + 0.5, width - 1, height - 1);
-    y += height + Math.round(gap * scale);
-  });
-
-  return output;
 }
 
 function getCanvasMargin(scale) {
@@ -534,14 +508,39 @@ function canvasToJpgBlob(canvas) {
 }
 
 function downloadBlob(blob, fileName) {
-  const url = URL.createObjectURL(blob);
+  return downloadBlobSequence([{ blob, fileName }]);
+}
+
+async function downloadBlobSequence(downloads) {
+  const items = downloads.map(({ blob, fileName }) => ({
+    fileName,
+    url: URL.createObjectURL(blob),
+  }));
+
+  for (let index = 0; index < items.length; index += 1) {
+    triggerDownload(items[index].url, items[index].fileName);
+    if (index < items.length - 1) await wait(850);
+  }
+
+  setTimeout(() => {
+    items.forEach(({ url }) => URL.revokeObjectURL(url));
+  }, 60000);
+}
+
+function triggerDownload(url, fileName) {
   const link = document.createElement("a");
   link.href = url;
   link.download = fileName;
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
   link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 function updatePrintPageRule() {
