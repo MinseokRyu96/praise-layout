@@ -672,7 +672,7 @@ textarea {
 }
 
 .sheet-slot.has-flow {
-  --flow-max-height: 28%;
+  --flow-max-height: 34%;
 }
 
 .slot-meta {
@@ -721,13 +721,13 @@ textarea {
   flex: 0 0 auto;
   max-height: var(--flow-max-height, 30%);
   overflow: hidden;
-  padding: 6px 8px;
+  padding: 7px 9px;
   border-top: 1px solid #edf0f5;
   background: #fbfcfe;
   color: #111827;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
-  line-height: 1.35;
+  line-height: 1.32;
   white-space: pre-wrap;
 }
 

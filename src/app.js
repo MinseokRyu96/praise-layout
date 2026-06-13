@@ -344,10 +344,10 @@ async function drawJpgSlot(ctx, song, rect, scale) {
   let flowHeight = 0;
   if (hasFlow) {
     const flowPadding = 8 * scale;
-    ctx.font = `800 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-    const lineHeight = 16 * scale;
+    ctx.font = `800 ${16 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    const lineHeight = 21 * scale;
     const flowLines = getWrappedLines(ctx, song.flow, rect.width - flowPadding * 2, 4);
-    flowHeight = Math.min(rect.height * 0.28, flowLines.length * lineHeight + flowPadding * 2);
+    flowHeight = Math.min(rect.height * 0.34, flowLines.length * lineHeight + flowPadding * 2);
     contentHeight -= flowHeight;
   }
 
@@ -370,9 +370,9 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.lineTo(rect.x + rect.width, flowY);
     ctx.stroke();
     ctx.fillStyle = "#111827";
-    ctx.font = `800 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = `800 ${16 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
     ctx.textBaseline = "top";
-    drawWrappedText(ctx, song.flow, rect.x + 8 * scale, flowY + 6 * scale, rect.width - 16 * scale, 16 * scale, Math.max(1, Math.floor((flowHeight - 12 * scale) / (16 * scale))));
+    drawWrappedText(ctx, song.flow, rect.x + 8 * scale, flowY + 6 * scale, rect.width - 16 * scale, 21 * scale, Math.max(1, Math.floor((flowHeight - 12 * scale) / (21 * scale))));
   }
 
   ctx.restore();
