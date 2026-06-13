@@ -6,7 +6,7 @@
     <title>사용 가이드 | PraiseLayout</title>
     <meta
       name="description"
-      content="PraiseLayout에서 찬양 콘티, 악보 이미지, A3 출력 설정을 입력하고 PDF 또는 JPG로 저장하는 방법입니다."
+      content="찬양 콘티를 A3 악보 PDF와 JPG로 정리하는 방법, 추천 설정, 리허설 체크리스트, 자주 묻는 질문을 안내합니다."
     />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://praise-layout.vercel.app/guide" />
@@ -22,7 +22,55 @@
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8104838143348148"
       crossorigin="anonymous"
     ></script>
-    <link rel="stylesheet" href="./styles.css?v=26" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "A3 한 장에 몇 곡을 넣는 게 좋나요?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "일반적인 예배팀 악보 공유에는 A3 가로 방향에 장당 2곡 배치를 추천합니다. 악보가 복잡하거나 코드가 많은 곡은 장당 1곡이 더 읽기 좋고, 간단한 리드 시트는 장당 3곡도 사용할 수 있습니다."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "모바일 공유에는 PDF와 JPG 중 무엇이 좋나요?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "인쇄와 보관에는 PDF가 적합하고, 휴대폰 갤러리나 메신저로 빠르게 공유할 때는 JPG가 편합니다. PraiseLayout의 JPG 다운로드는 페이지별 이미지로 저장됩니다."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "업로드한 악보가 서버에 저장되나요?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "현재 MVP 버전에서는 업로드한 악보 파일을 별도 서버에 저장하지 않고, 사용자의 브라우저에서 미리보기와 다운로드 생성을 위해 처리합니다."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "악보가 작게 보일 때는 어떻게 하나요?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "장당 곡 수를 줄이고 여백을 좁게 설정해 보세요. 코드가 많거나 악보 이미지 안에 여백이 큰 경우에는 A3 한 장에 1곡 또는 2곡 배치가 더 안정적입니다."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "저작권이 있는 악보를 업로드해도 되나요?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "PraiseLayout은 악보를 제공하지 않는 정리 도구입니다. 사용자는 본인이 사용 권한을 가진 악보 파일만 업로드해야 하며, 교회와 팀의 사용 범위 및 저작권 정책을 확인해야 합니다."
+            }
+          }
+        ]
+      }
+    </script>
+    <link rel="stylesheet" href="./styles.css?v=28" />
   </head>
   <body class="content-page">
     <header class="site-header">
@@ -45,36 +93,177 @@
         <p class="eyebrow">Guide</p>
         <h1>찬양 콘티를 A3 악보로 만드는 방법</h1>
         <p class="lead">
-          예배 날짜와 곡 정보를 입력하고 악보 이미지를 올리면, PraiseLayout이 A3 출력용 미리보기를 만듭니다.
+          PraiseLayout은 찬양 콘티와 악보 이미지를 한 화면에서 정리해 예배팀이 바로 인쇄하거나 모바일로
+          공유할 수 있는 PDF와 JPG 파일을 만드는 도구입니다.
         </p>
       </section>
 
-      <section class="content-section">
-        <h2>1. 콘티 정보를 입력하세요</h2>
+      <nav class="guide-toc" aria-label="가이드 목차">
+        <a href="#use-cases">1. 사용 상황</a>
+        <a href="#setlist-info">2. 콘티 정보</a>
+        <a href="#song-assets">3. 곡 정보와 악보</a>
+        <a href="#layout-settings">4. 추천 설정</a>
+        <a href="#download-types">5. PDF와 JPG</a>
+        <a href="#checklist">6. 체크리스트</a>
+        <a href="#copyright">7. 사용 권한</a>
+        <a href="#faq">8. FAQ</a>
+      </nav>
+
+      <section id="use-cases" class="content-section">
+        <h2>1. PraiseLayout은 어떤 상황에 쓰나요?</h2>
         <p>
-          콘티명, 예배 날짜, 곡 수를 입력합니다. 이 정보는 미리보기 상단과 다운로드 파일명에 반영됩니다.
+          예배 전 리허설 자료를 급하게 정리해야 하거나, 여러 곡의 악보를 A3 한 장에 보기 좋게 모아야 할 때
+          사용할 수 있습니다. 인도자, 싱어, 밴드 멤버가 같은 콘티 흐름을 보고 준비하도록 곡 순서와 악보를
+          한 파일로 정리하는 데 초점을 둡니다.
+        </p>
+        <ul class="content-list">
+          <li>주일예배, 수요예배, 금요기도회 등 예배별 찬양 콘티 정리</li>
+          <li>리허설 전에 싱어와 밴드에게 악보 이미지를 빠르게 공유</li>
+          <li>A3 인쇄용 PDF와 모바일 확인용 JPG를 한 번에 준비</li>
+          <li>곡별 인트로, 반복, 엔딩 등 흐름 메모를 악보와 함께 보관</li>
+        </ul>
+      </section>
+
+      <section id="setlist-info" class="content-section">
+        <h2>2. 예배 날짜와 콘티명 입력하기</h2>
+        <p>
+          상단의 콘티명과 예배 날짜는 미리보기 상단과 다운로드 파일명에 반영됩니다. 같은 예배 안에서도
+          부서나 시간대가 다르면 콘티명에 구분을 넣어두면 파일을 찾기 쉽습니다.
+        </p>
+        <ul class="content-list">
+          <li>콘티명 예시: 주일 2부 예배 찬양 콘티, 청년부 금요예배, 새벽기도회 특송</li>
+          <li>예배 날짜는 실제 사용일 기준으로 선택해 팀원이 파일을 혼동하지 않게 합니다.</li>
+          <li>곡 수는 현재 준비한 곡에 맞춰 3곡부터 6곡까지 선택할 수 있습니다.</li>
+        </ul>
+      </section>
+
+      <section id="song-assets" class="content-section">
+        <h2>3. 곡 정보와 악보 이미지 준비하기</h2>
+        <p>
+          곡명은 악보 영역의 제목으로 표시되고, 곡 흐름 메모는 리허설 중 확인해야 할 진행 정보를 적는 공간입니다.
+          악보 이미지는 글자와 코드가 선명한 파일을 사용하는 것이 좋습니다.
+        </p>
+        <ul class="content-list">
+          <li>곡명은 실제 콘티 순서대로 입력합니다.</li>
+          <li>흐름 메모에는 Intro, Verse, Chorus, Bridge, Ending처럼 팀이 합의한 용어를 사용합니다.</li>
+          <li>악보 이미지는 그림자가 적고 여백이 과하지 않은 파일이 A3 배치에서 더 잘 보입니다.</li>
+          <li>PDF 악보는 브라우저 미리보기 제약이 있을 수 있어, 가능하면 JPG나 PNG 이미지로 준비하는 것을 권장합니다.</li>
+        </ul>
+      </section>
+
+      <section id="layout-settings" class="content-section">
+        <h2>4. A3 레이아웃 추천 설정</h2>
+        <p>
+          A3 한 장에 너무 많은 곡을 넣으면 코드와 가사가 작아질 수 있습니다. 실제 사용 목적에 따라 방향,
+          장당 곡 수, 여백을 조합해 보세요.
+        </p>
+        <div class="scenario-grid">
+          <article class="scenario-item">
+            <h3>밴드 리허설용</h3>
+            <p>A3 가로, 장당 2곡, 기본 여백을 추천합니다. 여러 파트가 동시에 보기 좋고 인쇄 안정성도 좋습니다.</p>
+          </article>
+          <article class="scenario-item">
+            <h3>인도자 확인용</h3>
+            <p>A3 세로, 장당 1곡, 넓은 여백이 좋습니다. 코드와 진행 메모를 크게 보고 싶을 때 적합합니다.</p>
+          </article>
+          <article class="scenario-item">
+            <h3>모바일 공유용</h3>
+            <p>A3 가로, 장당 2곡, JPG 다운로드를 추천합니다. 페이지별 이미지로 저장되어 메신저 공유가 편합니다.</p>
+          </article>
+          <article class="scenario-item">
+            <h3>간단한 리드 시트용</h3>
+            <p>A3 가로, 장당 3곡, 좁은 여백을 사용할 수 있습니다. 악보가 단순할 때만 권장합니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="download-types" class="content-section">
+        <h2>5. PDF와 JPG 다운로드 차이</h2>
+        <p>
+          PDF는 인쇄와 보관에 적합하고, JPG는 휴대폰에서 바로 확인하거나 메신저로 공유하기 좋습니다. 팀의
+          사용 방식에 맞춰 둘 중 하나를 선택하거나 둘 다 저장해 두면 안전합니다.
+        </p>
+        <ul class="content-list">
+          <li>PDF 다운로드: A3 프린터 출력, 태블릿 보관, 예배 자료 아카이브에 적합합니다.</li>
+          <li>JPG 다운로드: 페이지별 이미지로 저장되어 휴대폰 갤러리와 메신저 공유에 적합합니다.</li>
+          <li>인쇄 전에는 PDF 미리보기에서 방향과 여백이 의도대로 보이는지 확인하세요.</li>
+        </ul>
+      </section>
+
+      <section id="checklist" class="content-section">
+        <h2>6. 찬양팀 리허설 전 체크리스트</h2>
+        <p>
+          악보 파일을 만들기 전 아래 항목을 확인하면 리허설 중 수정 시간을 줄일 수 있습니다.
+        </p>
+        <ul class="content-list checklist-list">
+          <li>곡 순서와 키가 최종 확정되었는지 확인</li>
+          <li>템포, 박자, 인트로 길이, 엔딩 방식을 팀과 공유</li>
+          <li>반복 구간과 브릿지 진입 시점을 흐름 메모에 기록</li>
+          <li>싱어, 건반, 기타, 드럼 등 파트별로 필요한 악보가 같은지 확인</li>
+          <li>악보 이미지가 너무 흐리거나 잘린 부분이 없는지 확인</li>
+          <li>PDF 인쇄본과 JPG 공유본을 리허설 전에 미리 전달</li>
+        </ul>
+      </section>
+
+      <section id="copyright" class="content-section">
+        <h2>7. 악보 파일 사용 권한 안내</h2>
+        <p>
+          PraiseLayout은 악보를 제공하거나 판매하는 서비스가 아니라, 사용자가 보유한 악보 파일을 정리하는
+          레이아웃 도구입니다. 업로드하는 악보와 이미지는 반드시 사용 권한을 가진 자료여야 하며, 교회와 팀의
+          내부 사용 범위 및 저작권 정책을 확인한 뒤 사용해야 합니다.
+        </p>
+        <p>
+          외부 공유, 공개 게시, 상업적 사용이 필요한 경우에는 해당 악보의 권리자 또는 관리 기관의 이용 조건을
+          먼저 확인하세요.
         </p>
       </section>
 
-      <section class="content-section">
-        <h2>2. 곡별 악보를 업로드하세요</h2>
-        <p>
-          각 곡의 제목과 흐름 메모를 입력한 뒤 악보 이미지를 업로드합니다. 업로드한 파일은 사용 권한이 있는
-          자료여야 합니다.
-        </p>
+      <section id="faq" class="content-section">
+        <h2>8. 자주 묻는 질문</h2>
+        <div class="faq-list">
+          <article class="faq-item">
+            <h3>A3 한 장에 몇 곡을 넣는 게 좋나요?</h3>
+            <p>
+              일반적인 예배팀 악보 공유에는 A3 가로 방향에 장당 2곡 배치를 추천합니다. 악보가 복잡하거나 코드가
+              많은 곡은 장당 1곡이 더 읽기 좋습니다.
+            </p>
+          </article>
+          <article class="faq-item">
+            <h3>모바일 공유에는 PDF와 JPG 중 무엇이 좋나요?</h3>
+            <p>
+              인쇄와 보관에는 PDF가 좋고, 휴대폰 갤러리나 메신저 공유에는 JPG가 편합니다. JPG는 페이지별 이미지로
+              저장됩니다.
+            </p>
+          </article>
+          <article class="faq-item">
+            <h3>업로드한 악보가 서버에 저장되나요?</h3>
+            <p>
+              현재 MVP 버전에서는 업로드한 악보 파일을 별도 서버에 저장하지 않고, 사용자의 브라우저에서 미리보기와
+              다운로드 생성을 위해 처리합니다.
+            </p>
+          </article>
+          <article class="faq-item">
+            <h3>악보가 작게 보일 때는 어떻게 하나요?</h3>
+            <p>
+              장당 곡 수를 줄이고 여백을 좁게 설정해 보세요. 코드가 많거나 악보 이미지 안에 여백이 큰 경우에는
+              A3 한 장에 1곡 또는 2곡 배치가 더 안정적입니다.
+            </p>
+          </article>
+          <article class="faq-item">
+            <h3>저작권이 있는 악보를 업로드해도 되나요?</h3>
+            <p>
+              사용 권한을 가진 악보만 업로드해야 합니다. PraiseLayout은 악보 자체를 제공하지 않으며, 업로드 자료의
+              사용 권한 확인은 사용자와 소속 팀의 책임입니다.
+            </p>
+          </article>
+        </div>
       </section>
 
       <section class="content-section">
-        <h2>3. A3 출력 설정을 조정하세요</h2>
+        <h2>바로 시작하기</h2>
         <p>
-          A3 가로 또는 세로 방향, 장당 곡 수, 여백을 선택해 예배팀 상황에 맞는 레이아웃을 만듭니다.
-        </p>
-      </section>
-
-      <section class="content-section">
-        <h2>4. PDF 또는 JPG로 저장하세요</h2>
-        <p>
-          PDF 다운로드는 인쇄와 공유에 적합하고, JPG 다운로드는 모바일에서 페이지별 이미지로 저장하기 좋습니다.
+          준비한 곡 정보와 악보 이미지가 있다면 <a href="./">PraiseLayout 도구 열기</a>에서 바로 A3 미리보기를
+          만들 수 있습니다.
         </p>
       </section>
     </main>
