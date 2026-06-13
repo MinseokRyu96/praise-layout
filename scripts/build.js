@@ -6,6 +6,13 @@ const dist = path.join(root, "dist");
 
 const entries = [
   "index.html",
+  "about.html",
+  "guide.html",
+  "privacy.html",
+  "terms.html",
+  "contact.html",
+  "robots.txt",
+  "sitemap.xml",
   "styles.css",
   "src",
 ];

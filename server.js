@@ -10,6 +10,8 @@ const mimeTypes = {
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
@@ -19,7 +21,11 @@ const mimeTypes = {
 function serveFile(req, res) {
   const requestedPath = new URL(req.url, `http://${req.headers.host}`).pathname;
   const safePath = path.normalize(decodeURIComponent(requestedPath)).replace(/^(\.\.[/\\])+/, "");
-  const filePath = path.join(root, safePath === "/" ? "index.html" : safePath);
+  let filePath = path.join(root, safePath === "/" ? "index.html" : safePath);
+
+  if (!path.extname(filePath) && !fs.existsSync(filePath) && fs.existsSync(`${filePath}.html`)) {
+    filePath = `${filePath}.html`;
+  }
 
   if (!filePath.startsWith(root)) {
     res.writeHead(403);
