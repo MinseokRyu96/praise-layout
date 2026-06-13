@@ -20,7 +20,6 @@ const state = {
   songs: [],
   files: [],
 };
-let activeJpgUrls = [];
 
 const sampleTitles = [
   "주 은혜임을",
@@ -41,7 +40,6 @@ const els = {
   showMeta: document.querySelector("#showMeta"),
   previewCanvas: document.querySelector("#previewCanvas"),
   warningBox: document.querySelector("#warningBox"),
-  jpgDownloadList: document.querySelector("#jpgDownloadList"),
   fileNameHint: document.querySelector("#fileNameHint"),
 };
 
@@ -208,7 +206,6 @@ function renderPreview() {
 
 async function downloadJpgPages() {
   renderPreview();
-  clearJpgDownloadLinks();
 
   const button = document.querySelector("#jpgButton");
   const originalText = button.textContent;
@@ -217,56 +214,19 @@ async function downloadJpgPages() {
 
   try {
     const pages = getSongPages();
-    const downloads = [];
+    const canvases = [];
     for (let index = 0; index < pages.length; index += 1) {
-      const canvas = await renderJpgCanvas(pages[index]);
-      const blob = await canvasToJpgBlob(canvas);
-      const pageSuffix = pages.length > 1 ? `_p${String(index + 1).padStart(2, "0")}` : "";
-      const fileName = `${getCleanBaseName()}${pageSuffix}.jpg`;
-      if (pages.length === 1) {
-        downloadBlob(blob, fileName);
-      } else {
-        downloads.push({ blob, fileName, label: `${index + 1}페이지 JPG` });
-      }
+      canvases.push(await renderJpgCanvas(pages[index]));
     }
-    renderJpgDownloadLinks(downloads);
+    const exportCanvas = combineJpgCanvases(canvases);
+    const blob = await canvasToJpgBlob(exportCanvas);
+    downloadBlob(blob, `${getCleanBaseName()}.jpg`);
   } catch (error) {
     alert("JPG 파일을 만드는 중 문제가 발생했습니다. 악보 이미지를 다시 업로드한 뒤 시도해 주세요.");
   } finally {
     button.disabled = false;
     button.textContent = originalText;
   }
-}
-
-function renderJpgDownloadLinks(downloads) {
-  if (!downloads.length) {
-    els.jpgDownloadList.hidden = true;
-    els.jpgDownloadList.innerHTML = "";
-    return;
-  }
-
-  activeJpgUrls = downloads.map((download) => {
-    const url = URL.createObjectURL(download.blob);
-    return { ...download, url };
-  });
-
-  els.jpgDownloadList.innerHTML = activeJpgUrls
-    .map(
-      (download) => `
-        <a class="jpg-download-link" href="${download.url}" download="${escapeHtml(download.fileName)}" target="_blank" rel="noopener">
-          ${escapeHtml(download.label)}
-        </a>
-      `,
-    )
-    .join("");
-  els.jpgDownloadList.hidden = false;
-}
-
-function clearJpgDownloadLinks() {
-  activeJpgUrls.forEach((download) => URL.revokeObjectURL(download.url));
-  activeJpgUrls = [];
-  els.jpgDownloadList.hidden = true;
-  els.jpgDownloadList.innerHTML = "";
 }
 
 async function renderJpgCanvas(songs) {
@@ -291,6 +251,36 @@ async function renderJpgCanvas(songs) {
   }
 
   return canvas;
+}
+
+function combineJpgCanvases(canvases) {
+  if (canvases.length === 1) return canvases[0];
+
+  const gap = 36;
+  const sourceWidth = canvases[0].width;
+  const sourceHeight = canvases.reduce((sum, canvas) => sum + canvas.height, 0) + gap * (canvases.length - 1);
+  const maxHeight = 8192;
+  const scale = Math.min(1, maxHeight / sourceHeight);
+  const output = document.createElement("canvas");
+  output.width = Math.round(sourceWidth * scale);
+  output.height = Math.round(sourceHeight * scale);
+
+  const ctx = output.getContext("2d");
+  ctx.fillStyle = "#f6f8fb";
+  ctx.fillRect(0, 0, output.width, output.height);
+
+  let y = 0;
+  canvases.forEach((canvas) => {
+    const width = Math.round(canvas.width * scale);
+    const height = Math.round(canvas.height * scale);
+    ctx.drawImage(canvas, 0, y, width, height);
+    ctx.strokeStyle = "#d6dde8";
+    ctx.lineWidth = Math.max(1, Math.round(scale));
+    ctx.strokeRect(0.5, y + 0.5, width - 1, height - 1);
+    y += height + Math.round(gap * scale);
+  });
+
+  return output;
 }
 
 function getCanvasMargin(scale) {
