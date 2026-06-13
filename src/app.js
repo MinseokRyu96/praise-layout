@@ -1,4 +1,6 @@
 const storageKey = "praise-layout-mvp-v10";
+const fileDbName = "praise-layout-files";
+const fileStoreName = "files";
 
 const today = new Date();
 const defaultDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7)
@@ -91,7 +93,11 @@ function saveSnapshot() {
     ...state,
     files: state.files.map(({ objectUrl, ...file }) => file),
   };
-  localStorage.setItem(storageKey, JSON.stringify(serializable));
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(serializable));
+  } catch {
+    // Large image fallbacks can exceed browser storage quotas; the current session still works.
+  }
 }
 
 function loadSnapshot() {
@@ -107,6 +113,109 @@ function loadSnapshot() {
   } catch {
     localStorage.removeItem(storageKey);
   }
+}
+
+function openFileDb() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      reject(new Error("IndexedDB is not available."));
+      return;
+    }
+
+    const request = indexedDB.open(fileDbName, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(fileStoreName)) {
+        db.createObjectStore(fileStoreName, { keyPath: "id" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Could not open file storage."));
+  });
+}
+
+async function runFileStore(mode, task) {
+  const db = await openFileDb();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(fileStoreName, mode);
+    const store = transaction.objectStore(fileStoreName);
+    let result;
+
+    transaction.oncomplete = () => {
+      db.close();
+      resolve(result);
+    };
+    transaction.onerror = () => {
+      db.close();
+      reject(transaction.error || new Error("File storage transaction failed."));
+    };
+
+    result = task(store);
+  });
+}
+
+function storeFileBlob(fileMeta, file) {
+  return runFileStore("readwrite", (store) => {
+    store.put({
+      id: fileMeta.id,
+      name: fileMeta.name,
+      type: fileMeta.type,
+      size: fileMeta.size,
+      blob: file,
+      updatedAt: Date.now(),
+    });
+  });
+}
+
+function readStoredFile(fileId) {
+  return runFileStore(
+    "readonly",
+    (store) =>
+      new Promise((resolve, reject) => {
+        const request = store.get(fileId);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error || new Error("Could not read stored file."));
+      }),
+  );
+}
+
+function deleteStoredFile(fileId) {
+  if (!fileId) return Promise.resolve();
+  return runFileStore("readwrite", (store) => {
+    store.delete(fileId);
+  });
+}
+
+async function restoreStoredFileObjectUrls() {
+  let didRestore = false;
+
+  for (const file of state.files) {
+    if (file.objectUrl || file.dataUrl || !file.id) continue;
+    const stored = await readStoredFile(file.id);
+    if (!stored?.blob) continue;
+    file.name = file.name || stored.name;
+    file.type = file.type || stored.type;
+    file.size = file.size || stored.size;
+    file.objectUrl = file.type.startsWith("image/") ? URL.createObjectURL(stored.blob) : "";
+    didRestore = true;
+  }
+
+  return didRestore;
+}
+
+function getFileSource(file) {
+  if (!file || file.type === "application/pdf") return "";
+  return file.objectUrl || file.dataUrl || "";
+}
+
+function removeFile(fileId) {
+  if (!fileId) return;
+  const index = state.files.findIndex((file) => file.id === fileId);
+  if (index === -1) return;
+
+  const [file] = state.files.splice(index, 1);
+  if (file.objectUrl) URL.revokeObjectURL(file.objectUrl);
+  deleteStoredFile(fileId).catch(() => {});
 }
 
 function migratePlaceholderDefaults() {
@@ -140,8 +249,7 @@ function renderSongs() {
             <div class="song-title-row">
               <span class="song-index">${song.order}</span>
               <label class="field-block title-field">
-                <span>곡명</span>
-                <input data-field="title" value="${escapeHtml(song.title)}" placeholder="예: ${escapeHtml(sampleTitles[song.order - 1] || "곡명")}" />
+                <input data-field="title" value="${escapeHtml(song.title)}" aria-label="곡명" placeholder="찬양 이름을 입력해주세요" />
               </label>
             </div>
             <label class="field-block flow-field">
@@ -174,7 +282,8 @@ function renderSongs() {
 function renderFilePreview(file) {
   if (!file) return "";
   if (file.type === "application/pdf") return `<span class="pdf-placeholder">PDF<br />${escapeHtml(file.name)}</span>`;
-  if (file.objectUrl) return `<img src="${file.objectUrl}" alt="${escapeHtml(file.name)} 미리보기" />`;
+  const source = getFileSource(file);
+  if (source) return `<img src="${escapeHtml(source)}" alt="${escapeHtml(file.name)} 미리보기" />`;
   return `<span>${escapeHtml(file.name)}<br />이전 세션 파일은 다시 업로드하면 미리보기가 표시됩니다.</span>`;
 }
 
@@ -380,8 +489,9 @@ async function drawJpgSlot(ctx, song, rect, scale) {
 
 async function drawSheetImage(ctx, song, frame, scale) {
   const file = getFile(song);
-  if (file?.objectUrl && file.type !== "application/pdf") {
-    const image = await loadImage(file.objectUrl);
+  const fileSource = getFileSource(file);
+  if (fileSource) {
+    const image = await loadImage(fileSource);
     drawImageContain(ctx, image, frame.x, frame.y, frame.width, frame.height);
     return;
   }
@@ -571,7 +681,7 @@ function renderSlot(song) {
       }
       <div class="slot-body">
         <div class="sheet-frame">
-          ${file && file.objectUrl && file.type !== "application/pdf" ? `<img src="${file.objectUrl}" alt="${escapeHtml(song.title)} 악보" />` : '<div class="fallback-sheet" aria-label="악보 자리"></div>'}
+          ${getFileSource(file) ? `<img src="${escapeHtml(getFileSource(file))}" alt="${escapeHtml(song.title)} 악보" />` : '<div class="fallback-sheet" aria-label="악보 자리"></div>'}
         </div>
       </div>
       ${hasFlow ? `<div class="slot-flow">${escapeHtml(song.flow)}</div>` : ""}
@@ -594,8 +704,17 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
-function handleFileList(fileList, songId = "") {
-  [...fileList].forEach((file) => {
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(reader.error || new Error("Could not read file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleFileList(fileList, songId = "") {
+  for (const file of [...fileList]) {
     const item = {
       id: crypto.randomUUID(),
       name: file.name,
@@ -603,12 +722,29 @@ function handleFileList(fileList, songId = "") {
       size: file.size,
       objectUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
     };
+    try {
+      await storeFileBlob(item, file);
+    } catch {
+      if (file.type.startsWith("image/")) {
+        try {
+          item.dataUrl = await readFileAsDataUrl(file);
+        } catch {
+          alert("브라우저 저장 공간 문제로 악보 파일을 장기 저장하지 못했습니다. 현재 화면에서는 계속 사용할 수 있어요.");
+        }
+      } else {
+        alert("브라우저 저장 공간 문제로 악보 파일을 장기 저장하지 못했습니다. 현재 화면에서는 계속 사용할 수 있어요.");
+      }
+    }
+
+    const previousFileId = songId ? state.songs.find((entry) => entry.id === songId)?.fileId : "";
+    if (previousFileId) removeFile(previousFileId);
+
     state.files.push(item);
     if (songId) {
       const song = state.songs.find((entry) => entry.id === songId);
       if (song) song.fileId = item.id;
     }
-  });
+  }
   render();
 }
 
@@ -666,14 +802,14 @@ function bindEvents() {
     saveSnapshot();
   });
 
-  document.body.addEventListener("change", (event) => {
+  document.body.addEventListener("change", async (event) => {
     const card = event.target.closest("[data-song-id]");
     if (!card) return;
     const song = state.songs.find((entry) => entry.id === card.dataset.songId);
     if (!song) return;
 
     if (event.target.dataset.action === "single-upload") {
-      handleFileList(event.target.files, song.id);
+      await handleFileList(event.target.files, song.id);
       event.target.value = "";
       return;
     }
@@ -687,6 +823,11 @@ function boot() {
   ensureSongCount(state.setlist.songCount);
   bindEvents();
   render();
+  restoreStoredFileObjectUrls()
+    .then((didRestore) => {
+      if (didRestore) render();
+    })
+    .catch(() => {});
 }
 
 boot();
