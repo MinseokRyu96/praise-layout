@@ -454,9 +454,14 @@ function drawClampedLine(ctx, text, x, y, maxWidth) {
 
 function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
   const lines = getWrappedLines(ctx, text, maxWidth, maxLines);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, maxWidth, lineHeight * maxLines);
+  ctx.clip();
   lines.forEach((line, index) => {
-    ctx.fillText(line, x, y + index * lineHeight, maxWidth);
+    ctx.fillText(line, x, y + index * lineHeight);
   });
+  ctx.restore();
 }
 
 function getWrappedLines(ctx, text, maxWidth, maxLines = 99) {
@@ -464,23 +469,22 @@ function getWrappedLines(ctx, text, maxWidth, maxLines = 99) {
   const paragraphs = String(text || "").split(/\n/);
 
   paragraphs.forEach((paragraph) => {
-    const words = paragraph.split(/\s+/).filter(Boolean);
-    if (!words.length) {
+    if (!paragraph.trim()) {
       lines.push("");
       return;
     }
 
     let line = "";
-    words.forEach((word) => {
-      const next = line ? `${line} ${word}` : word;
+    Array.from(paragraph).forEach((char) => {
+      const next = `${line}${char}`;
       if (ctx.measureText(next).width <= maxWidth || !line) {
         line = next;
       } else {
-        lines.push(line);
-        line = word;
+        lines.push(line.trimEnd());
+        line = char.trimStart();
       }
     });
-    lines.push(line);
+    if (line) lines.push(line.trimEnd());
   });
 
   if (lines.length <= maxLines) return lines;
