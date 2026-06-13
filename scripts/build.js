@@ -11,6 +11,7 @@ const entries = [
   "privacy.html",
   "terms.html",
   "contact.html",
+  "ads.txt",
   "robots.txt",
   "sitemap.xml",
   "styles.css",
