@@ -20,6 +20,7 @@ const state = {
   songs: [],
   files: [],
 };
+let activeJpgUrls = [];
 
 const sampleTitles = [
   "주 은혜임을",
@@ -40,6 +41,7 @@ const els = {
   showMeta: document.querySelector("#showMeta"),
   previewCanvas: document.querySelector("#previewCanvas"),
   warningBox: document.querySelector("#warningBox"),
+  jpgDownloadList: document.querySelector("#jpgDownloadList"),
   fileNameHint: document.querySelector("#fileNameHint"),
 };
 
@@ -206,6 +208,7 @@ function renderPreview() {
 
 async function downloadJpgPages() {
   renderPreview();
+  clearJpgDownloadLinks();
 
   const button = document.querySelector("#jpgButton");
   const originalText = button.textContent;
@@ -214,19 +217,56 @@ async function downloadJpgPages() {
 
   try {
     const pages = getSongPages();
+    const downloads = [];
     for (let index = 0; index < pages.length; index += 1) {
       const canvas = await renderJpgCanvas(pages[index]);
       const blob = await canvasToJpgBlob(canvas);
       const pageSuffix = pages.length > 1 ? `_p${String(index + 1).padStart(2, "0")}` : "";
-      downloadBlob(blob, `${getCleanBaseName()}${pageSuffix}.jpg`);
-      if (pages.length > 1) await wait(180);
+      const fileName = `${getCleanBaseName()}${pageSuffix}.jpg`;
+      if (pages.length === 1) {
+        downloadBlob(blob, fileName);
+      } else {
+        downloads.push({ blob, fileName, label: `${index + 1}페이지 JPG` });
+      }
     }
+    renderJpgDownloadLinks(downloads);
   } catch (error) {
     alert("JPG 파일을 만드는 중 문제가 발생했습니다. 악보 이미지를 다시 업로드한 뒤 시도해 주세요.");
   } finally {
     button.disabled = false;
     button.textContent = originalText;
   }
+}
+
+function renderJpgDownloadLinks(downloads) {
+  if (!downloads.length) {
+    els.jpgDownloadList.hidden = true;
+    els.jpgDownloadList.innerHTML = "";
+    return;
+  }
+
+  activeJpgUrls = downloads.map((download) => {
+    const url = URL.createObjectURL(download.blob);
+    return { ...download, url };
+  });
+
+  els.jpgDownloadList.innerHTML = activeJpgUrls
+    .map(
+      (download) => `
+        <a class="jpg-download-link" href="${download.url}" download="${escapeHtml(download.fileName)}" target="_blank" rel="noopener">
+          ${escapeHtml(download.label)}
+        </a>
+      `,
+    )
+    .join("");
+  els.jpgDownloadList.hidden = false;
+}
+
+function clearJpgDownloadLinks() {
+  activeJpgUrls.forEach((download) => URL.revokeObjectURL(download.url));
+  activeJpgUrls = [];
+  els.jpgDownloadList.hidden = true;
+  els.jpgDownloadList.innerHTML = "";
 }
 
 async function renderJpgCanvas(songs) {
@@ -512,10 +552,6 @@ function downloadBlob(blob, fileName) {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function updatePrintPageRule() {

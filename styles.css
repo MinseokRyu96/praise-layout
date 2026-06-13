@@ -555,6 +555,33 @@ textarea {
   font-weight: 800;
 }
 
+.jpg-download-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.jpg-download-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 10px 13px;
+  border: 1px solid rgba(15, 118, 110, 0.35);
+  border-radius: 8px;
+  background: #eef7f5;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.jpg-download-link:hover {
+  border-color: rgba(15, 118, 110, 0.55);
+  background: #e2f3ee;
+}
+
 .file-name-hint {
   color: var(--muted);
   font-size: 13px;
@@ -868,6 +895,15 @@ textarea {
 
   .flow-field textarea {
     min-height: 96px;
+  }
+
+  .jpg-download-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .jpg-download-link {
+    width: 100%;
   }
 
   .a3-page {
