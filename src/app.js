@@ -27,6 +27,7 @@ const sampleTitles = [
   "주님의 시선",
   "나는 주를 섬기는 것에 후회가 없습니다",
 ];
+const legacyDefaultSetlistTitle = "주일 2부 예배 찬양 콘티";
 
 const els = {
   setlistTitle: document.querySelector("#setlistTitle"),
@@ -102,9 +103,21 @@ function loadSnapshot() {
     Object.assign(state.layout, saved.layout || {});
     state.songs = Array.isArray(saved.songs) ? saved.songs : [];
     state.files = Array.isArray(saved.files) ? saved.files : [];
+    migratePlaceholderDefaults();
   } catch {
     localStorage.removeItem(storageKey);
   }
+}
+
+function migratePlaceholderDefaults() {
+  if (state.setlist.title === legacyDefaultSetlistTitle) {
+    state.setlist.title = "";
+  }
+
+  state.songs = state.songs.map((song, index) => {
+    if (song.title !== sampleTitles[index]) return song;
+    return { ...song, title: "" };
+  });
 }
 
 function syncControls() {
