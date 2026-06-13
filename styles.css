@@ -153,6 +153,10 @@ a:focus-visible {
   color: var(--accent-dark);
 }
 
+.mobile-site-footer {
+  display: none;
+}
+
 .workspace {
   width: min(1600px, 100%);
   margin: 0 auto;
@@ -898,15 +902,27 @@ textarea {
     display: none;
   }
 
-  .footer-links {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 0;
+  .sidebar .footer-links {
+    display: none;
   }
 
-  .footer-links a {
+  .mobile-site-footer {
+    display: block;
+    padding: 0 14px 22px;
+  }
+
+  .mobile-site-footer .footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0;
+    padding-top: 4px;
+  }
+
+  .mobile-site-footer .footer-links a {
     padding: 8px 6px;
     border-radius: 7px;
     background: #ffffff;
+    color: #697586;
+    font-size: 12px;
     text-align: center;
   }
 
