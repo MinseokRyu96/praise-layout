@@ -490,7 +490,8 @@ textarea {
 }
 
 .recommendation-input-row {
-  grid-template-columns: minmax(0, 1fr) 112px 92px;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: stretch;
 }
 
 .song-recommendation-box textarea {

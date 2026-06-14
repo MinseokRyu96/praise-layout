@@ -68,6 +68,57 @@ const keyOptions = [
   "Bbm",
   "Bm",
 ];
+const recommendationCatalog = [
+  { title: "주 은혜임을", key: "E", tags: ["은혜", "고백", "회복", "잔잔"], reason: "은혜를 고백하는 흐름에 자연스럽게 이어집니다." },
+  { title: "시간을 뚫고", key: "D", tags: ["기다림", "신뢰", "고백", "잔잔"], reason: "하나님의 일하심을 신뢰하는 분위기와 잘 맞습니다." },
+  { title: "주님의 시선", key: "F", tags: ["헌신", "시선", "고백", "잔잔"], reason: "헌신과 고백 중심의 콘티에서 연결감이 좋습니다." },
+  { title: "나는 주를 섬기는 것에 후회가 없습니다", key: "F", tags: ["헌신", "결단", "고백", "회복"], reason: "섬김과 결단의 메시지를 강하게 이어갈 수 있습니다." },
+  { title: "원하고 바라고 기도합니다", key: "F", tags: ["기도", "소망", "고백", "잔잔"], reason: "기도와 소망의 주제를 부드럽게 확장합니다." },
+  { title: "Way Maker", key: "E", tags: ["신뢰", "선포", "소망", "예배"], reason: "하나님의 길을 선포하는 분위기로 전환하기 좋습니다." },
+  { title: "주가 일하시네", key: "C", tags: ["신뢰", "소망", "고백", "잔잔"], reason: "기다림과 신뢰의 메시지를 같은 결로 이어줍니다." },
+  { title: "예수 아름다우신", key: "A", tags: ["예수", "경배", "찬양", "잔잔"], reason: "예수님께 초점을 모으는 경배 흐름에 적합합니다." },
+  { title: "아무것도 두려워 말라", key: "C", tags: ["위로", "평안", "신뢰", "회복"], reason: "위로와 평안의 메시지가 필요한 콘티에 잘 맞습니다." },
+  { title: "꽃들도", key: "D", tags: ["감사", "소망", "고백", "잔잔"], reason: "감사와 소망을 차분하게 고백하는 흐름을 만듭니다." },
+  { title: "하나님의 부르심", key: "E", tags: ["부르심", "헌신", "결단", "고백"], reason: "부르심과 헌신의 주제를 분명하게 이어줍니다." },
+  { title: "나의 한숨을 바꾸셨네", key: "C", tags: ["회복", "위로", "은혜", "소망"], reason: "회복과 위로가 필요한 예배 흐름에 적합합니다." },
+  { title: "주의 나라가 임할 때", key: "D", tags: ["선포", "하나님나라", "부흥", "예배"], reason: "공동체적 선포와 부흥의 에너지를 살릴 수 있습니다." },
+  { title: "나는 예배자입니다", key: "F", tags: ["예배", "정체성", "고백", "헌신"], reason: "예배자로 서는 고백을 명확하게 이어줍니다." },
+  { title: "내 모습 이대로", key: "E", tags: ["은혜", "회복", "고백", "잔잔"], reason: "있는 모습 그대로 나아가는 고백과 잘 맞습니다." },
+  { title: "마라나타", key: "G", tags: ["소망", "재림", "선포", "예배"], reason: "소망과 선포의 방향으로 예배를 끌어올립니다." },
+  { title: "주만 의지해", key: "G", tags: ["신뢰", "고백", "평안", "잔잔"], reason: "하나님만 의지하는 메시지를 단순하게 이어줍니다." },
+  { title: "은혜", key: "C", tags: ["은혜", "감사", "고백", "회복"], reason: "은혜와 감사의 주제를 직접적으로 강화합니다." },
+  { title: "충만", key: "D", tags: ["성령", "충만", "기도", "예배"], reason: "성령의 임재와 충만을 구하는 흐름에 적합합니다." },
+  { title: "주 품에", key: "G", tags: ["위로", "평안", "신뢰", "잔잔"], reason: "평안과 위로의 분위기를 안정적으로 이어줍니다." },
+  { title: "내 삶의 이유라", key: "E", tags: ["예수", "고백", "헌신", "예배"], reason: "예수님을 삶의 이유로 고백하는 메시지와 연결됩니다." },
+  { title: "그 사랑", key: "G", tags: ["사랑", "십자가", "은혜", "고백"], reason: "십자가 사랑과 은혜의 주제를 깊게 이어갑니다." },
+  { title: "찬양하세", key: "A", tags: ["기쁨", "찬양", "선포", "빠른"], reason: "밝고 힘 있는 찬양 흐름으로 전환하기 좋습니다." },
+  { title: "기뻐하며 왕께", key: "G", tags: ["기쁨", "찬양", "선포", "빠른"], reason: "예배 초반의 기쁨과 선포 분위기에 잘 맞습니다." },
+  { title: "예수 열방의 소망", key: "A", tags: ["예수", "소망", "선포", "찬양"], reason: "예수님을 소망으로 선포하는 흐름을 만들 수 있습니다." },
+  { title: "나 주님의 기쁨되기 원하네", key: "G", tags: ["헌신", "고백", "결단", "잔잔"], reason: "헌신과 순종의 결단으로 자연스럽게 이어집니다." },
+];
+const recommendationKeywordMap = {
+  감사: ["감사", "은혜", "기쁨"],
+  기도: ["기도", "소망", "신뢰"],
+  기쁨: ["기쁨", "찬양", "빠른", "선포"],
+  빠른: ["빠른", "기쁨", "찬양", "선포"],
+  밝은: ["기쁨", "찬양", "빠른"],
+  선포: ["선포", "찬양", "예배"],
+  은혜: ["은혜", "감사", "회복"],
+  회복: ["회복", "위로", "은혜"],
+  위로: ["위로", "평안", "회복"],
+  평안: ["평안", "위로", "신뢰"],
+  신뢰: ["신뢰", "소망", "고백"],
+  소망: ["소망", "신뢰", "선포"],
+  헌신: ["헌신", "결단", "고백"],
+  결단: ["결단", "헌신", "고백"],
+  예배: ["예배", "고백", "경배"],
+  경배: ["경배", "예배", "예수"],
+  예수: ["예수", "경배", "고백"],
+  십자가: ["십자가", "사랑", "은혜"],
+  사랑: ["사랑", "은혜", "고백"],
+  성령: ["성령", "충만", "기도"],
+  부흥: ["부흥", "선포", "하나님나라"],
+};
 
 const els = {
   setlistTitle: document.querySelector("#setlistTitle"),
@@ -93,7 +144,6 @@ function createSong(index) {
     recommendationHint: "",
     recommendationResult: "",
     recommendationStatus: "",
-    llmModel: "",
     analysisStatus: "",
     flow: "",
     fileId: "",
@@ -357,15 +407,13 @@ function renderSongs() {
             <div class="song-recommendation-box">
               <div class="recommendation-head">
                 <strong>비슷한 찬양 추천</strong>
-                <span>로컬 LLM</span>
+                <span>자동 추천</span>
               </div>
               <div class="recommendation-input-row">
-                <input data-field="youtubeUrl" value="${escapeHtml(song.youtubeUrl)}" aria-label="YouTube 링크" placeholder="YouTube 링크" />
-                <input data-field="llmModel" value="${escapeHtml(song.llmModel)}" aria-label="로컬 LLM 모델" placeholder="llama3.1" />
-                <button data-action="llm-recommend" class="mini-button" type="button">추천받기</button>
+                <textarea data-field="recommendationHint" rows="2" aria-label="추천 힌트" placeholder="분위기, 주제, 가사 일부를 적으면 추천 정확도가 올라갑니다">${escapeHtml(song.recommendationHint)}</textarea>
+                <button data-action="song-recommend" class="mini-button" type="button">추천받기</button>
               </div>
-              <textarea data-field="recommendationHint" rows="2" aria-label="추천 힌트" placeholder="영상의 분위기, 주제, 가사 일부를 적으면 추천 정확도가 올라갑니다">${escapeHtml(song.recommendationHint)}</textarea>
-              <span class="analysis-status">${escapeHtml(song.recommendationStatus || "PC에서 Ollama가 실행 중일 때 사용할 수 있습니다.")}</span>
+              <span class="analysis-status">${escapeHtml(song.recommendationStatus || "곡명, Key, 추천 힌트를 기준으로 앱 안에서 바로 추천합니다.")}</span>
               ${song.recommendationResult ? `<pre class="recommendation-result">${escapeHtml(song.recommendationResult)}</pre>` : ""}
             </div>
             <label class="field-block flow-field">
@@ -829,21 +877,6 @@ function readFileAsDataUrl(file) {
   });
 }
 
-function extractYouTubeVideoId(value) {
-  try {
-    const url = new URL(value);
-    const pathParts = url.pathname.split("/").filter(Boolean);
-    if (url.hostname.includes("youtu.be")) return pathParts[0] || "";
-    if (url.hostname.includes("youtube.com")) {
-      if (pathParts[0] === "shorts" || pathParts[0] === "embed") return pathParts[1] || "";
-      return url.searchParams.get("v") || "";
-    }
-  } catch {
-    return "";
-  }
-  return "";
-}
-
 function normalizeKeyName(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
@@ -853,77 +886,88 @@ function normalizeKeyName(value) {
   return `${match[1].toUpperCase()}${match[2]}${match[3] ? "m" : ""}`;
 }
 
-function getRecommendationPrompt(song) {
-  const videoId = extractYouTubeVideoId(song.youtubeUrl);
-  const linkLine = song.youtubeUrl ? `- YouTube 링크: ${song.youtubeUrl}` : "- YouTube 링크: 없음";
-  const videoLine = videoId ? `- YouTube video id: ${videoId}` : "- YouTube video id: 확인 안 됨";
-  const titleLine = song.title ? `- 현재 곡명: ${song.title}` : "- 현재 곡명: 미입력";
-  const keyLine = song.key ? `- 현재 Key: ${song.key}` : "- 현재 Key: 미선택";
-  const hintLine = song.recommendationHint ? `- 사용자가 적은 분위기/주제 힌트: ${song.recommendationHint}` : "- 사용자가 적은 분위기/주제 힌트: 없음";
+function normalizeRecommendationText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^\uac00-\ud7a3a-z0-9#b\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getRecommendationTags(song) {
+  const text = normalizeRecommendationText([song.title, song.recommendationHint, song.flow].filter(Boolean).join(" "));
+  const tags = new Set();
+
+  Object.entries(recommendationKeywordMap).forEach(([keyword, mappedTags]) => {
+    if (!text.includes(keyword)) return;
+    mappedTags.forEach((tag) => tags.add(tag));
+  });
+
+  recommendationCatalog.forEach((item) => {
+    if (!text || !normalizeRecommendationText(item.title).includes(text)) return;
+    item.tags.forEach((tag) => tags.add(tag));
+  });
+
+  return [...tags];
+}
+
+function getRecommendedSongs(song) {
+  const tags = getRecommendationTags(song);
+  const currentTitle = normalizeRecommendationText(song.title);
+  const normalizedHint = normalizeRecommendationText(song.recommendationHint);
+  const hasInput = Boolean(currentTitle || normalizedHint || song.key);
+
+  if (!hasInput) return [];
+
+  return recommendationCatalog
+    .map((item, index) => {
+      const sameTitle = currentTitle && normalizeRecommendationText(item.title) === currentTitle;
+      const tagScore = item.tags.reduce((score, tag) => score + (tags.includes(tag) ? 4 : 0), 0);
+      const keyScore = song.key && item.key === song.key ? 2 : 0;
+      const titleScore =
+        currentTitle &&
+        item.tags.some((tag) => currentTitle.includes(tag)) ? 2 : 0;
+      const fallbackScore = tags.length ? 0 : Math.max(0, recommendationCatalog.length - index) / 100;
+      return {
+        ...item,
+        score: sameTitle ? -1 : tagScore + keyScore + titleScore + fallbackScore,
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, "ko"))
+    .slice(0, 5);
+}
+
+function formatRecommendations(recommendations, song) {
+  const basis = [
+    song.title ? `곡명: ${song.title}` : "",
+    song.key ? `Key: ${song.key}` : "",
+    song.recommendationHint ? `힌트: ${song.recommendationHint}` : "",
+  ].filter(Boolean);
 
   return [
-    "너는 한국 교회 찬양팀 콘티를 돕는 큐레이터다.",
-    "아래 입력을 바탕으로 비슷한 느낌과 주제의 찬양을 추천해라.",
-    "중요: YouTube 링크를 직접 열람하거나 영상을 들은 것처럼 말하지 마라. 링크나 제목만으로 확신할 수 없으면 그 한계를 반영해 추천해라.",
+    `추천 기준: ${basis.join(" / ")}`,
     "",
-    linkLine,
-    videoLine,
-    titleLine,
-    keyLine,
-    hintLine,
+    ...recommendations.map(
+      (item, index) => `${index + 1}. ${item.title} - ${item.reason} - Key 후보: ${item.key}`,
+    ),
     "",
-    "출력 형식:",
-    "1. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
-    "2. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
-    "3. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
-    "4. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
-    "5. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
-    "",
-    "마지막 줄에는 콘티 연결 팁을 한 문장으로 써라.",
+    "콘티 팁: 현재 곡의 메시지와 같은 태그를 가진 곡을 앞뒤에 배치하면 예배 흐름이 덜 끊깁니다.",
   ].join("\n");
 }
 
-async function requestLocalRecommendations(song) {
-  const model = song.llmModel?.trim() || "llama3.1";
-  const response = await fetch("http://localhost:11434/api/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      prompt: getRecommendationPrompt(song),
-      stream: false,
-      options: {
-        temperature: 0.72,
-      },
-    }),
-  });
-
-  if (!response.ok) throw new Error("Local LLM request failed.");
-  const data = await response.json();
-  return String(data.response || "").trim();
-}
-
-async function handleLocalRecommendation(song) {
-  if (!song.youtubeUrl && !song.title && !song.recommendationHint) {
-    song.recommendationStatus = "YouTube 링크나 추천 힌트를 입력해주세요.";
+function handleSongRecommendation(song) {
+  const recommendations = getRecommendedSongs(song);
+  if (!recommendations.length) {
+    song.recommendationStatus = "곡명, Key 또는 추천 힌트를 입력해주세요.";
+    song.recommendationResult = "";
     renderSongs();
     return;
   }
 
-  song.recommendationStatus = "로컬 LLM에서 추천을 생성하는 중입니다.";
-  song.recommendationResult = "";
-  renderSongs();
-
-  try {
-    song.recommendationResult = await requestLocalRecommendations(song);
-    song.recommendationStatus = "추천 결과를 생성했습니다.";
-    render();
-  } catch {
-    song.recommendationStatus = "로컬 LLM 연결에 실패했습니다. Ollama 실행 상태, 모델명, 브라우저 접근 권한을 확인해주세요.";
-    renderSongs();
-  }
+  song.recommendationResult = formatRecommendations(recommendations, song);
+  song.recommendationStatus = "앱 내부 추천 목록에서 비슷한 찬양을 골랐습니다.";
+  render();
 }
 
 async function analyzeAudioKey(file) {
@@ -1173,14 +1217,14 @@ function bindEvents() {
     saveSnapshot();
   });
 
-  document.body.addEventListener("click", async (event) => {
-    const button = event.target.closest("[data-action='llm-recommend']");
+  document.body.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-action='song-recommend']");
     if (!button) return;
     const card = button.closest("[data-song-id]");
     const song = state.songs.find((entry) => entry.id === card?.dataset.songId);
     if (!song) return;
     button.disabled = true;
-    await handleLocalRecommendation(song);
+    handleSongRecommendation(song);
     button.disabled = false;
   });
 
