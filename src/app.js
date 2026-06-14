@@ -1,4 +1,5 @@
 const storageKey = "praise-layout-mvp-v10";
+const songKeyStorageKey = "praise-layout-song-key-memory-v1";
 const fileDbName = "praise-layout-files";
 const fileStoreName = "files";
 
@@ -30,6 +31,43 @@ const sampleTitles = [
   "나는 주를 섬기는 것에 후회가 없습니다",
 ];
 const legacyDefaultSetlistTitle = "주일 2부 예배 찬양 콘티";
+const keyOptions = [
+  "",
+  "C",
+  "C#",
+  "Db",
+  "D",
+  "D#",
+  "Eb",
+  "E",
+  "F",
+  "F#",
+  "Gb",
+  "G",
+  "G#",
+  "Ab",
+  "A",
+  "A#",
+  "Bb",
+  "B",
+  "Cm",
+  "C#m",
+  "Dbm",
+  "Dm",
+  "D#m",
+  "Ebm",
+  "Em",
+  "Fm",
+  "F#m",
+  "Gbm",
+  "Gm",
+  "G#m",
+  "Abm",
+  "Am",
+  "A#m",
+  "Bbm",
+  "Bm",
+];
 
 const els = {
   setlistTitle: document.querySelector("#setlistTitle"),
@@ -50,6 +88,9 @@ function createSong(index) {
     id: crypto.randomUUID(),
     order: index + 1,
     title: "",
+    key: "",
+    youtubeUrl: "",
+    analysisStatus: "",
     flow: "",
     fileId: "",
   };
@@ -59,7 +100,11 @@ function ensureSongCount(count) {
   while (state.songs.length < count) {
     state.songs.push(createSong(state.songs.length));
   }
-  state.songs = state.songs.slice(0, count).map((song, index) => ({ ...song, order: index + 1 }));
+  state.songs = state.songs.slice(0, count).map((song, index) => ({
+    ...createSong(index),
+    ...song,
+    order: index + 1,
+  }));
 }
 
 function getFile(song) {
@@ -77,6 +122,11 @@ function getCleanFileName(extension = "pdf") {
 
 function getPageHeading() {
   return [state.setlist.worshipDate, state.setlist.title].filter(Boolean).join("  |  ");
+}
+
+function getSongLabel(song) {
+  const title = song.title || "곡명 없음";
+  return song.key ? `${song.order}. ${title} [${song.key}]` : `${song.order}. ${title}`;
 }
 
 function getSongPages() {
@@ -218,6 +268,39 @@ function removeFile(fileId) {
   deleteStoredFile(fileId).catch(() => {});
 }
 
+function normalizeSongTitle(title) {
+  return String(title || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function getSongKeyMemory() {
+  try {
+    return JSON.parse(localStorage.getItem(songKeyStorageKey) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function rememberSongKey(title, key) {
+  const normalizedTitle = normalizeSongTitle(title);
+  if (!normalizedTitle || !key) return;
+  const memory = getSongKeyMemory();
+  memory[normalizedTitle] = {
+    title: title.trim(),
+    key,
+    updatedAt: Date.now(),
+  };
+  localStorage.setItem(songKeyStorageKey, JSON.stringify(memory));
+}
+
+function findRememberedKey(title) {
+  const normalizedTitle = normalizeSongTitle(title);
+  if (!normalizedTitle) return "";
+  return getSongKeyMemory()[normalizedTitle]?.key || "";
+}
+
 function migratePlaceholderDefaults() {
   if (state.setlist.title === legacyDefaultSetlistTitle) {
     state.setlist.title = "";
@@ -248,9 +331,28 @@ function renderSongs() {
           <div class="song-card-body">
             <div class="song-title-row">
               <span class="song-index">${song.order}</span>
-              <label class="field-block title-field">
-                <input data-field="title" value="${escapeHtml(song.title)}" aria-label="곡명" placeholder="찬양 이름을 입력해주세요" />
+              <div class="title-key-grid">
+                <label class="field-block title-field">
+                  <input data-field="title" value="${escapeHtml(song.title)}" aria-label="곡명" placeholder="찬양 이름을 입력해주세요" />
+                </label>
+                <label class="field-block key-field">
+                  <span>Key</span>
+                  <select data-field="key" aria-label="Key">
+                    ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.key === key ? "selected" : ""}>${key || "선택"}</option>`).join("")}
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="song-source-row">
+              <input data-field="youtubeUrl" value="${escapeHtml(song.youtubeUrl)}" aria-label="YouTube 링크" placeholder="YouTube 링크를 붙여넣으면 제목을 가져옵니다" />
+              <button data-action="youtube-analyze" class="mini-button" type="button">정보 가져오기</button>
+            </div>
+            <div class="song-analysis-row">
+              <label class="file-drop key-audio-drop">
+                <input data-action="key-audio-upload" type="file" accept="audio/*" />
+                오디오로 Key 추정
               </label>
+              <span class="analysis-status">${escapeHtml(song.analysisStatus || "Key는 직접 선택하거나 오디오 파일로 추정할 수 있습니다.")}</span>
             </div>
             <label class="field-block flow-field">
               <span>곡 흐름</span>
@@ -444,7 +546,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.fillStyle = "#182230";
     ctx.font = `900 ${13 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
     ctx.textBaseline = "middle";
-    drawClampedLine(ctx, `${song.order}. ${song.title || "곡명 없음"}`, rect.x + 9 * scale, rect.y + metaHeight / 2, rect.width - 18 * scale);
+    drawClampedLine(ctx, getSongLabel(song), rect.x + 9 * scale, rect.y + metaHeight / 2, rect.width - 18 * scale);
     contentY += metaHeight;
     contentHeight -= metaHeight;
   }
@@ -675,7 +777,7 @@ function renderSlot(song) {
       ${
         state.layout.showMeta
           ? `<div class="slot-meta">
-              <strong>${song.order}. ${escapeHtml(song.title || "곡명 없음")}</strong>
+              <strong>${escapeHtml(getSongLabel(song))}</strong>
             </div>`
           : ""
       }
@@ -711,6 +813,235 @@ function readFileAsDataUrl(file) {
     reader.onerror = () => reject(reader.error || new Error("Could not read file."));
     reader.readAsDataURL(file);
   });
+}
+
+function extractYouTubeVideoId(value) {
+  try {
+    const url = new URL(value);
+    const pathParts = url.pathname.split("/").filter(Boolean);
+    if (url.hostname.includes("youtu.be")) return pathParts[0] || "";
+    if (url.hostname.includes("youtube.com")) {
+      if (pathParts[0] === "shorts" || pathParts[0] === "embed") return pathParts[1] || "";
+      return url.searchParams.get("v") || "";
+    }
+  } catch {
+    return "";
+  }
+  return "";
+}
+
+function normalizeKeyName(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const normalized = raw.replace(/♯/g, "#").replace(/♭/g, "b");
+  const match = normalized.match(/^([A-Ga-g])([#b]?)(m?)$/);
+  if (!match) return "";
+  return `${match[1].toUpperCase()}${match[2]}${match[3] ? "m" : ""}`;
+}
+
+function extractKeyFromText(value) {
+  const text = String(value || "").replace(/♯/g, "#").replace(/♭/g, "b");
+  const labeled = text.match(/(?:key|키|원키)\s*[:=-]?\s*([A-G](?:#|b)?m?)/i);
+  if (labeled) return normalizeKeyName(labeled[1]);
+  const trailing = text.match(/([A-G](?:#|b)?m?)\s*(?:key|키)/i);
+  if (trailing) return normalizeKeyName(trailing[1]);
+  return "";
+}
+
+function cleanYouTubeTitle(title) {
+  const primaryTitle = String(title || "")
+    .replace(/\[[^\]]*(official|lyrics?|가사|mv|music video|live|cover)[^\]]*\]/gi, "")
+    .replace(/\([^)]*(official|lyrics?|가사|mv|music video|live|cover)[^)]*\)/gi, "")
+    .split(/\s[|｜]\s/)[0];
+
+  return primaryTitle
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function fetchYouTubeMetadata(url) {
+  const videoId = extractYouTubeVideoId(url);
+  if (!videoId) throw new Error("Invalid YouTube URL.");
+  const target = `https://www.youtube.com/watch?v=${videoId}`;
+  const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(target)}&format=json`);
+  if (!response.ok) throw new Error("Could not fetch YouTube metadata.");
+  return response.json();
+}
+
+async function handleYouTubeAnalysis(song) {
+  if (!song.youtubeUrl) {
+    song.analysisStatus = "YouTube 링크를 입력해주세요.";
+    renderSongs();
+    return;
+  }
+
+  song.analysisStatus = "YouTube 정보를 가져오는 중입니다.";
+  renderSongs();
+
+  try {
+    const metadata = await fetchYouTubeMetadata(song.youtubeUrl);
+    const title = cleanYouTubeTitle(metadata.title);
+    const keyFromTitle = extractKeyFromText(metadata.title);
+    const rememberedKey = findRememberedKey(title);
+
+    if (title) song.title = title;
+    if (keyFromTitle || rememberedKey) song.key = keyFromTitle || rememberedKey;
+    song.analysisStatus = song.key
+      ? `제목을 가져왔고 Key 후보 ${song.key}를 적용했습니다.`
+      : "제목을 가져왔습니다. Key는 직접 선택하거나 오디오로 추정해주세요.";
+
+    if (song.title && song.key) rememberSongKey(song.title, song.key);
+    render();
+  } catch {
+    song.analysisStatus = "YouTube 정보를 가져오지 못했습니다. 링크를 확인하거나 직접 입력해주세요.";
+    renderSongs();
+  }
+}
+
+async function analyzeAudioKey(file) {
+  const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextConstructor) throw new Error("Web Audio is not available.");
+
+  const audioContext = new AudioContextConstructor();
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const sampleRate = audioBuffer.sampleRate;
+    const duration = audioBuffer.duration;
+    const frameSize = 4096;
+    const stepSize = Math.max(frameSize, Math.floor(sampleRate * 1.2));
+    const start = duration > 35 ? Math.floor(sampleRate * 5) : 0;
+    const end = Math.min(audioBuffer.length - frameSize, start + Math.floor(sampleRate * 120));
+    const chroma = Array(12).fill(0);
+    let analyzedFrames = 0;
+
+    for (let offset = start; offset < end && analyzedFrames < 72; offset += stepSize) {
+      const frame = getMonoFrame(audioBuffer, offset, frameSize);
+      const rms = getRms(frame);
+      if (rms < 0.012) continue;
+
+      const pitch = detectPitch(frame, sampleRate);
+      if (!pitch) continue;
+
+      const midi = Math.round(69 + 12 * Math.log2(pitch.frequency / 440));
+      const pitchClass = ((midi % 12) + 12) % 12;
+      chroma[pitchClass] += pitch.confidence * rms;
+      analyzedFrames += 1;
+    }
+
+    if (!chroma.some(Boolean)) {
+      throw new Error("Could not detect tonal content.");
+    }
+
+    return estimateKeyFromChroma(chroma);
+  } finally {
+    audioContext.close?.().catch(() => {});
+  }
+}
+
+function getMonoFrame(audioBuffer, offset, frameSize) {
+  const frame = new Float32Array(frameSize);
+  const channelCount = Math.min(audioBuffer.numberOfChannels, 2);
+  for (let channel = 0; channel < channelCount; channel += 1) {
+    const data = audioBuffer.getChannelData(channel);
+    for (let index = 0; index < frameSize; index += 1) {
+      frame[index] += (data[offset + index] || 0) / channelCount;
+    }
+  }
+  return frame;
+}
+
+function getRms(frame) {
+  let sum = 0;
+  for (let index = 0; index < frame.length; index += 1) {
+    sum += frame[index] * frame[index];
+  }
+  return Math.sqrt(sum / frame.length);
+}
+
+function detectPitch(frame, sampleRate) {
+  const minFrequency = 70;
+  const maxFrequency = 700;
+  const minLag = Math.floor(sampleRate / maxFrequency);
+  const maxLag = Math.min(Math.floor(sampleRate / minFrequency), frame.length - 1);
+  let bestLag = 0;
+  let bestCorrelation = 0;
+
+  for (let lag = minLag; lag <= maxLag; lag += 1) {
+    let correlation = 0;
+    let energyA = 0;
+    let energyB = 0;
+
+    for (let index = 0; index < frame.length - lag; index += 1) {
+      const a = frame[index];
+      const b = frame[index + lag];
+      correlation += a * b;
+      energyA += a * a;
+      energyB += b * b;
+    }
+
+    const normalized = correlation / Math.sqrt(energyA * energyB || 1);
+    if (normalized > bestCorrelation) {
+      bestCorrelation = normalized;
+      bestLag = lag;
+    }
+  }
+
+  if (!bestLag || bestCorrelation < 0.38) return null;
+  return {
+    frequency: sampleRate / bestLag,
+    confidence: bestCorrelation,
+  };
+}
+
+function estimateKeyFromChroma(chroma) {
+  const pitchClasses = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  const majorProfile = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
+  const minorProfile = [6.33, 2.68, 3.52, 5.38, 2.6, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
+  const scores = [];
+
+  for (let root = 0; root < 12; root += 1) {
+    scores.push({ key: pitchClasses[root], score: correlateKeyProfile(chroma, majorProfile, root) });
+    scores.push({ key: `${pitchClasses[root]}m`, score: correlateKeyProfile(chroma, minorProfile, root) });
+  }
+
+  scores.sort((a, b) => b.score - a.score);
+  const best = scores[0];
+  const second = scores[1];
+  const confidence = Math.max(0, Math.min(0.99, (best.score - second.score + 0.15) / 1.15));
+  return {
+    key: best.key,
+    confidence,
+  };
+}
+
+function correlateKeyProfile(chroma, profile, root) {
+  const chromaSum = chroma.reduce((sum, value) => sum + value, 0) || 1;
+  const normalizedChroma = chroma.map((value) => value / chromaSum);
+  const profileSum = profile.reduce((sum, value) => sum + value, 0);
+  const normalizedProfile = profile.map((value) => value / profileSum);
+  let score = 0;
+  for (let index = 0; index < 12; index += 1) {
+    score += normalizedChroma[index] * normalizedProfile[(index - root + 12) % 12];
+  }
+  return score;
+}
+
+async function handleAudioKeyAnalysis(song, file) {
+  if (!file) return;
+  song.analysisStatus = "오디오에서 Key를 추정하는 중입니다.";
+  renderSongs();
+
+  try {
+    const result = await analyzeAudioKey(file);
+    song.key = normalizeKeyName(result.key);
+    song.analysisStatus = `추정 Key: ${song.key} / 신뢰도 ${Math.round(result.confidence * 100)}%. 실제 콘티 Key와 다르면 수정해주세요.`;
+    if (song.title && song.key) rememberSongKey(song.title, song.key);
+    render();
+  } catch {
+    song.analysisStatus = "Key를 추정하지 못했습니다. 더 선명한 오디오 파일을 사용하거나 직접 선택해주세요.";
+    renderSongs();
+  }
 }
 
 async function handleFileList(fileList, songId = "") {
@@ -798,8 +1129,31 @@ function bindEvents() {
     const song = state.songs.find((entry) => entry.id === card.dataset.songId);
     if (!song) return;
     song[event.target.dataset.field] = event.target.value;
+    let shouldRenderSongs = false;
+    if (event.target.dataset.field === "title" && !song.key) {
+      const rememberedKey = findRememberedKey(song.title);
+      if (rememberedKey) {
+        song.key = rememberedKey;
+        shouldRenderSongs = true;
+      }
+    }
+    if ((event.target.dataset.field === "title" || event.target.dataset.field === "key") && song.title && song.key) {
+      rememberSongKey(song.title, song.key);
+    }
+    if (shouldRenderSongs) renderSongs();
     renderPreview();
     saveSnapshot();
+  });
+
+  document.body.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-action='youtube-analyze']");
+    if (!button) return;
+    const card = button.closest("[data-song-id]");
+    const song = state.songs.find((entry) => entry.id === card?.dataset.songId);
+    if (!song) return;
+    button.disabled = true;
+    await handleYouTubeAnalysis(song);
+    button.disabled = false;
   });
 
   document.body.addEventListener("change", async (event) => {
@@ -808,8 +1162,21 @@ function bindEvents() {
     const song = state.songs.find((entry) => entry.id === card.dataset.songId);
     if (!song) return;
 
+    if (event.target.dataset.field) {
+      song[event.target.dataset.field] = event.target.value;
+      if (song.title && song.key) rememberSongKey(song.title, song.key);
+      render();
+      return;
+    }
+
     if (event.target.dataset.action === "single-upload") {
       await handleFileList(event.target.files, song.id);
+      event.target.value = "";
+      return;
+    }
+
+    if (event.target.dataset.action === "key-audio-upload") {
+      await handleAudioKeyAnalysis(song, event.target.files?.[0]);
       event.target.value = "";
       return;
     }

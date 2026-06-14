@@ -388,6 +388,14 @@ textarea {
   min-width: 0;
 }
 
+.title-key-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 96px;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .song-index {
   display: grid;
   width: 40px;
@@ -430,8 +438,49 @@ textarea {
   font-weight: 800;
 }
 
-.song-title-row .title-field {
-  flex: 1 1 auto;
+.key-field select {
+  min-height: 48px;
+  font-weight: 900;
+}
+
+.song-source-row,
+.song-analysis-row {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.song-source-row {
+  grid-template-columns: minmax(0, 1fr) 118px;
+}
+
+.song-analysis-row {
+  grid-template-columns: 148px minmax(0, 1fr);
+  align-items: center;
+}
+
+.mini-button {
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.key-audio-drop {
+  min-height: 42px;
+  padding: 9px 10px;
+  font-size: 13px;
+}
+
+.analysis-status {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .upload-panel {
@@ -483,6 +532,12 @@ textarea {
   }
 
   .song-card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .title-key-grid,
+  .song-source-row,
+  .song-analysis-row {
     grid-template-columns: 1fr;
   }
 
@@ -1042,6 +1097,12 @@ textarea {
   .settings-grid,
   .layout-quick-settings,
   .song-card-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .title-key-grid,
+  .song-source-row,
+  .song-analysis-row {
     grid-template-columns: minmax(0, 1fr);
   }
 
