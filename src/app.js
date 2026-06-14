@@ -90,6 +90,10 @@ function createSong(index) {
     title: "",
     key: "",
     youtubeUrl: "",
+    recommendationHint: "",
+    recommendationResult: "",
+    recommendationStatus: "",
+    llmModel: "",
     analysisStatus: "",
     flow: "",
     fileId: "",
@@ -343,16 +347,26 @@ function renderSongs() {
                 </label>
               </div>
             </div>
-            <div class="song-source-row">
-              <input data-field="youtubeUrl" value="${escapeHtml(song.youtubeUrl)}" aria-label="YouTube 링크" placeholder="YouTube 링크를 붙여넣으면 제목을 가져옵니다" />
-              <button data-action="youtube-analyze" class="mini-button" type="button">정보 가져오기</button>
-            </div>
             <div class="song-analysis-row">
               <label class="file-drop key-audio-drop">
                 <input data-action="key-audio-upload" type="file" accept="audio/*" />
                 오디오로 Key 추정
               </label>
               <span class="analysis-status">${escapeHtml(song.analysisStatus || "Key는 직접 선택하거나 오디오 파일로 추정할 수 있습니다.")}</span>
+            </div>
+            <div class="song-recommendation-box">
+              <div class="recommendation-head">
+                <strong>비슷한 찬양 추천</strong>
+                <span>로컬 LLM</span>
+              </div>
+              <div class="recommendation-input-row">
+                <input data-field="youtubeUrl" value="${escapeHtml(song.youtubeUrl)}" aria-label="YouTube 링크" placeholder="YouTube 링크" />
+                <input data-field="llmModel" value="${escapeHtml(song.llmModel)}" aria-label="로컬 LLM 모델" placeholder="llama3.1" />
+                <button data-action="llm-recommend" class="mini-button" type="button">추천받기</button>
+              </div>
+              <textarea data-field="recommendationHint" rows="2" aria-label="추천 힌트" placeholder="영상의 분위기, 주제, 가사 일부를 적으면 추천 정확도가 올라갑니다">${escapeHtml(song.recommendationHint)}</textarea>
+              <span class="analysis-status">${escapeHtml(song.recommendationStatus || "PC에서 Ollama가 실행 중일 때 사용할 수 있습니다.")}</span>
+              ${song.recommendationResult ? `<pre class="recommendation-result">${escapeHtml(song.recommendationResult)}</pre>` : ""}
             </div>
             <label class="field-block flow-field">
               <span>곡 흐름</span>
@@ -839,61 +853,75 @@ function normalizeKeyName(value) {
   return `${match[1].toUpperCase()}${match[2]}${match[3] ? "m" : ""}`;
 }
 
-function extractKeyFromText(value) {
-  const text = String(value || "").replace(/♯/g, "#").replace(/♭/g, "b");
-  const labeled = text.match(/(?:key|키|원키)\s*[:=-]?\s*([A-G](?:#|b)?m?)/i);
-  if (labeled) return normalizeKeyName(labeled[1]);
-  const trailing = text.match(/([A-G](?:#|b)?m?)\s*(?:key|키)/i);
-  if (trailing) return normalizeKeyName(trailing[1]);
-  return "";
+function getRecommendationPrompt(song) {
+  const videoId = extractYouTubeVideoId(song.youtubeUrl);
+  const linkLine = song.youtubeUrl ? `- YouTube 링크: ${song.youtubeUrl}` : "- YouTube 링크: 없음";
+  const videoLine = videoId ? `- YouTube video id: ${videoId}` : "- YouTube video id: 확인 안 됨";
+  const titleLine = song.title ? `- 현재 곡명: ${song.title}` : "- 현재 곡명: 미입력";
+  const keyLine = song.key ? `- 현재 Key: ${song.key}` : "- 현재 Key: 미선택";
+  const hintLine = song.recommendationHint ? `- 사용자가 적은 분위기/주제 힌트: ${song.recommendationHint}` : "- 사용자가 적은 분위기/주제 힌트: 없음";
+
+  return [
+    "너는 한국 교회 찬양팀 콘티를 돕는 큐레이터다.",
+    "아래 입력을 바탕으로 비슷한 느낌과 주제의 찬양을 추천해라.",
+    "중요: YouTube 링크를 직접 열람하거나 영상을 들은 것처럼 말하지 마라. 링크나 제목만으로 확신할 수 없으면 그 한계를 반영해 추천해라.",
+    "",
+    linkLine,
+    videoLine,
+    titleLine,
+    keyLine,
+    hintLine,
+    "",
+    "출력 형식:",
+    "1. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
+    "2. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
+    "3. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
+    "4. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
+    "5. 추천 찬양명 - 추천 이유 한 문장 - 어울리는 Key 후보",
+    "",
+    "마지막 줄에는 콘티 연결 팁을 한 문장으로 써라.",
+  ].join("\n");
 }
 
-function cleanYouTubeTitle(title) {
-  const primaryTitle = String(title || "")
-    .replace(/\[[^\]]*(official|lyrics?|가사|mv|music video|live|cover)[^\]]*\]/gi, "")
-    .replace(/\([^)]*(official|lyrics?|가사|mv|music video|live|cover)[^)]*\)/gi, "")
-    .split(/\s[|｜]\s/)[0];
+async function requestLocalRecommendations(song) {
+  const model = song.llmModel?.trim() || "llama3.1";
+  const response = await fetch("http://localhost:11434/api/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      prompt: getRecommendationPrompt(song),
+      stream: false,
+      options: {
+        temperature: 0.72,
+      },
+    }),
+  });
 
-  return primaryTitle
-    .replace(/\s+/g, " ")
-    .trim();
+  if (!response.ok) throw new Error("Local LLM request failed.");
+  const data = await response.json();
+  return String(data.response || "").trim();
 }
 
-async function fetchYouTubeMetadata(url) {
-  const videoId = extractYouTubeVideoId(url);
-  if (!videoId) throw new Error("Invalid YouTube URL.");
-  const target = `https://www.youtube.com/watch?v=${videoId}`;
-  const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(target)}&format=json`);
-  if (!response.ok) throw new Error("Could not fetch YouTube metadata.");
-  return response.json();
-}
-
-async function handleYouTubeAnalysis(song) {
-  if (!song.youtubeUrl) {
-    song.analysisStatus = "YouTube 링크를 입력해주세요.";
+async function handleLocalRecommendation(song) {
+  if (!song.youtubeUrl && !song.title && !song.recommendationHint) {
+    song.recommendationStatus = "YouTube 링크나 추천 힌트를 입력해주세요.";
     renderSongs();
     return;
   }
 
-  song.analysisStatus = "YouTube 정보를 가져오는 중입니다.";
+  song.recommendationStatus = "로컬 LLM에서 추천을 생성하는 중입니다.";
+  song.recommendationResult = "";
   renderSongs();
 
   try {
-    const metadata = await fetchYouTubeMetadata(song.youtubeUrl);
-    const title = cleanYouTubeTitle(metadata.title);
-    const keyFromTitle = extractKeyFromText(metadata.title);
-    const rememberedKey = findRememberedKey(title);
-
-    if (title) song.title = title;
-    if (keyFromTitle || rememberedKey) song.key = keyFromTitle || rememberedKey;
-    song.analysisStatus = song.key
-      ? `제목을 가져왔고 Key 후보 ${song.key}를 적용했습니다.`
-      : "제목을 가져왔습니다. Key는 직접 선택하거나 오디오로 추정해주세요.";
-
-    if (song.title && song.key) rememberSongKey(song.title, song.key);
+    song.recommendationResult = await requestLocalRecommendations(song);
+    song.recommendationStatus = "추천 결과를 생성했습니다.";
     render();
   } catch {
-    song.analysisStatus = "YouTube 정보를 가져오지 못했습니다. 링크를 확인하거나 직접 입력해주세요.";
+    song.recommendationStatus = "로컬 LLM 연결에 실패했습니다. Ollama 실행 상태, 모델명, 브라우저 접근 권한을 확인해주세요.";
     renderSongs();
   }
 }
@@ -1146,13 +1174,13 @@ function bindEvents() {
   });
 
   document.body.addEventListener("click", async (event) => {
-    const button = event.target.closest("[data-action='youtube-analyze']");
+    const button = event.target.closest("[data-action='llm-recommend']");
     if (!button) return;
     const card = button.closest("[data-song-id]");
     const song = state.songs.find((entry) => entry.id === card?.dataset.songId);
     if (!song) return;
     button.disabled = true;
-    await handleYouTubeAnalysis(song);
+    await handleLocalRecommendation(song);
     button.disabled = false;
   });
 
