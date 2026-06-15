@@ -49,7 +49,7 @@
         }
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=40" />
+    <link rel="stylesheet" href="./styles.css?v=41" />
   </head>
   <body>
     <div class="app-shell">
@@ -90,84 +90,88 @@
           </div>
         </header>
 
-        <section id="composer" class="panel intro-panel">
-          <div class="composer-main">
-            <div class="setlist-form">
-              <label>
-                콘티명
-                <input id="setlistTitle" type="text" placeholder="예: 주일 2부 예배 찬양 콘티" />
-              </label>
-              <label>
-                예배 날짜
-                <input id="worshipDate" type="date" />
-              </label>
-              <label>
-                곡 수
-                <select id="songCount">
-                  <option value="3">3곡</option>
-                  <option value="4" selected>4곡</option>
-                  <option value="5">5곡</option>
-                  <option value="6">6곡</option>
-                </select>
-              </label>
-            </div>
-            <div class="layout-quick-settings" aria-label="A3 출력 설정">
-              <label>
-                방향
-                <select id="orientation">
-                  <option value="landscape" selected>A3 가로</option>
-                  <option value="portrait">A3 세로</option>
-                </select>
-              </label>
-              <label>
-                장당 곡 수
-                <select id="songsPerPage">
-                  <option value="1">1곡</option>
-                  <option value="2" selected>2곡</option>
-                  <option value="3">3곡</option>
-                  <option value="4">4곡</option>
-                </select>
-              </label>
-              <label>
-                여백
-                <select id="marginMode">
-                  <option value="tight">좁게</option>
-                  <option value="normal" selected>기본</option>
-                  <option value="wide">넓게</option>
-                </select>
-              </label>
-              <label>
-                표시
-                <span class="checkbox-row">
-                  <input id="showMeta" type="checkbox" checked />
-                  제목/흐름
-                </span>
-              </label>
-            </div>
-          </div>
-        </section>
+        <div class="split-workbench">
+          <div class="editor-column">
+            <section id="composer" class="panel intro-panel">
+              <div class="composer-main">
+                <div class="setlist-form">
+                  <label>
+                    콘티명
+                    <input id="setlistTitle" type="text" placeholder="예: 주일 2부 예배 찬양 콘티" />
+                  </label>
+                  <label>
+                    예배 날짜
+                    <input id="worshipDate" type="date" />
+                  </label>
+                  <label>
+                    곡 수
+                    <select id="songCount">
+                      <option value="3">3곡</option>
+                      <option value="4" selected>4곡</option>
+                      <option value="5">5곡</option>
+                      <option value="6">6곡</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="layout-quick-settings" aria-label="A3 출력 설정">
+                  <label>
+                    방향
+                    <select id="orientation">
+                      <option value="landscape" selected>A3 가로</option>
+                      <option value="portrait">A3 세로</option>
+                    </select>
+                  </label>
+                  <label>
+                    장당 곡 수
+                    <select id="songsPerPage">
+                      <option value="1">1곡</option>
+                      <option value="2" selected>2곡</option>
+                      <option value="3">3곡</option>
+                      <option value="4">4곡</option>
+                    </select>
+                  </label>
+                  <label>
+                    여백
+                    <select id="marginMode">
+                      <option value="tight">좁게</option>
+                      <option value="normal" selected>기본</option>
+                      <option value="wide">넓게</option>
+                    </select>
+                  </label>
+                  <label>
+                    표시
+                    <span class="checkbox-row">
+                      <input id="showMeta" type="checkbox" checked />
+                      제목/흐름
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </section>
 
-        <section id="songs" class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Step 1</p>
-              <h2>곡 정보 입력</h2>
-            </div>
+            <section id="songs" class="panel">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Step 1</p>
+                  <h2>곡 정보 입력</h2>
+                </div>
+              </div>
+              <div id="songList" class="song-list"></div>
+            </section>
           </div>
-          <div id="songList" class="song-list"></div>
-        </section>
 
-        <section id="preview" class="preview-section">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Step 2</p>
-              <h2>출력 미리보기</h2>
+          <section id="preview" class="preview-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Step 2</p>
+                <h2>출력 미리보기</h2>
+              </div>
+              <span id="fileNameHint" class="file-name-hint"></span>
             </div>
-            <span id="fileNameHint" class="file-name-hint"></span>
-          </div>
-          <div id="warningBox" class="warning-box" hidden></div>
-          <div id="previewCanvas" class="preview-canvas" aria-live="polite"></div>
-        </section>
+            <div id="warningBox" class="warning-box" hidden></div>
+            <div id="previewCanvas" class="preview-canvas" aria-live="polite"></div>
+          </section>
+        </div>
       </main>
       <footer class="mobile-site-footer" aria-label="사이트 정보">
         <nav class="footer-links">
