@@ -68,6 +68,11 @@ const keyOptions = [
   "Bbm",
   "Bm",
 ];
+const markerOptions = ["V", "Ch", "P.C", "Br"];
+let activeMarker = {
+  songId: "",
+  label: "",
+};
 const els = {
   setlistTitle: document.querySelector("#setlistTitle"),
   worshipDate: document.querySelector("#worshipDate"),
@@ -89,6 +94,7 @@ function createSong(index) {
     title: "",
     key: "",
     flow: "",
+    markers: [],
     fileId: "",
   };
 }
@@ -356,6 +362,15 @@ function renderSongs() {
             }
           </div>
           <div class="song-card-actions">
+            <div class="marker-toolbar" aria-label="악보 마커">
+              ${markerOptions
+                .map(
+                  (label) =>
+                    `<button data-action="marker-select" data-label="${escapeHtml(label)}" class="marker-tool ${activeMarker.songId === song.id && activeMarker.label === label ? "active" : ""}" type="button">${escapeHtml(label)}</button>`,
+                )
+                .join("")}
+              <button data-action="markers-clear" class="marker-tool marker-clear" type="button">마커 삭제</button>
+            </div>
             <label class="file-drop">
               <input data-action="single-upload" type="file" accept="image/png,image/jpeg,application/pdf" />
               ${file ? "악보 다시 업로드" : "악보 업로드"}
@@ -373,6 +388,27 @@ function renderFilePreview(file) {
   const source = getFileSource(file);
   if (source) return `<img src="${escapeHtml(source)}" alt="${escapeHtml(file.name)} 미리보기" />`;
   return `<span>${escapeHtml(file.name)}<br />이전 세션 파일은 다시 업로드하면 미리보기가 표시됩니다.</span>`;
+}
+
+function getSongMarkers(song) {
+  return Array.isArray(song.markers) ? song.markers : [];
+}
+
+function renderMarkers(song) {
+  return getSongMarkers(song)
+    .map(
+      (marker) => `
+        <button
+          class="sheet-marker"
+          data-action="marker-remove"
+          data-marker-id="${escapeHtml(marker.id)}"
+          type="button"
+          style="left: ${Number(marker.x || 0) * 100}%; top: ${Number(marker.y || 0) * 100}%"
+          aria-label="${escapeHtml(marker.label)} 마커 삭제"
+        >${escapeHtml(marker.label)}</button>
+      `,
+    )
+    .join("");
 }
 
 function renderPreview() {
@@ -556,6 +592,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     height: contentHeight - bodyPadding * 2,
   };
   await drawSheetImage(ctx, song, frame, scale);
+  drawSheetMarkers(ctx, song, frame, scale);
 
   if (hasFlow) {
     const flowY = rect.y + rect.height - flowHeight;
@@ -590,6 +627,54 @@ async function drawSheetImage(ctx, song, frame, scale) {
   }
 
   drawFallbackSheet(ctx, frame, scale);
+}
+
+function drawSheetMarkers(ctx, song, frame, scale) {
+  getSongMarkers(song).forEach((marker) => {
+    const x = frame.x + frame.width * Number(marker.x || 0);
+    const y = frame.y + frame.height * Number(marker.y || 0);
+    const fontSize = 14 * scale;
+    const paddingX = 6 * scale;
+    const paddingY = 4 * scale;
+    const radius = 5 * scale;
+    const label = String(marker.label || "");
+    if (!label) return;
+
+    ctx.save();
+    ctx.font = `900 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    const textWidth = ctx.measureText(label).width;
+    const width = textWidth + paddingX * 2;
+    const height = fontSize + paddingY * 2;
+    const left = x - width / 2;
+    const top = y - height / 2;
+
+    drawRoundRect(ctx, left, top, width, height, radius);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+    ctx.fill();
+    ctx.strokeStyle = "#111827";
+    ctx.lineWidth = Math.max(1, 1.3 * scale);
+    ctx.stroke();
+    ctx.fillStyle = "#111827";
+    ctx.fillText(label, x, y + 0.5 * scale);
+    ctx.restore();
+  });
+}
+
+function drawRoundRect(ctx, x, y, width, height, radius) {
+  const safeRadius = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + safeRadius, y);
+  ctx.lineTo(x + width - safeRadius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+  ctx.lineTo(x + width, y + height - safeRadius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+  ctx.lineTo(x + safeRadius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+  ctx.lineTo(x, y + safeRadius);
+  ctx.quadraticCurveTo(x, y, x + safeRadius, y);
+  ctx.closePath();
 }
 
 function drawImageContain(ctx, image, x, y, width, height) {
@@ -768,8 +853,9 @@ function renderSlot(song) {
           : ""
       }
       <div class="slot-body">
-        <div class="sheet-frame">
+        <div class="sheet-frame" data-action="marker-place" data-song-id="${song.id}">
           ${getFileSource(file) ? `<img src="${escapeHtml(getFileSource(file))}" alt="${escapeHtml(song.title)} 악보" />` : '<div class="fallback-sheet" aria-label="악보 자리"></div>'}
+          <div class="sheet-marker-layer">${renderMarkers(song)}</div>
         </div>
       </div>
       ${hasFlow ? `<div class="slot-flow">${escapeHtml(song.flow)}</div>` : ""}
@@ -799,6 +885,39 @@ function readFileAsDataUrl(file) {
     reader.onerror = () => reject(reader.error || new Error("Could not read file."));
     reader.readAsDataURL(file);
   });
+}
+
+function clampMarkerValue(value) {
+  return Math.max(0.02, Math.min(0.98, value));
+}
+
+function setActiveMarker(songId, label) {
+  activeMarker = {
+    songId,
+    label,
+  };
+  renderSongs();
+}
+
+function addMarker(song, x, y) {
+  song.markers = getSongMarkers(song);
+  song.markers.push({
+    id: crypto.randomUUID(),
+    label: activeMarker.label,
+    x: clampMarkerValue(x),
+    y: clampMarkerValue(y),
+  });
+  render();
+}
+
+function removeMarker(song, markerId) {
+  song.markers = getSongMarkers(song).filter((marker) => marker.id !== markerId);
+  render();
+}
+
+function clearMarkers(song) {
+  song.markers = [];
+  render();
 }
 
 async function handleFileList(fileList, songId = "") {
@@ -878,6 +997,41 @@ function bindEvents() {
   });
   document.querySelector("#jpgButton").addEventListener("click", () => {
     downloadJpgPages();
+  });
+
+  document.body.addEventListener("click", (event) => {
+    const markerButton = event.target.closest("[data-action='marker-select']");
+    if (markerButton) {
+      const card = markerButton.closest("[data-song-id]");
+      if (!card) return;
+      setActiveMarker(card.dataset.songId, markerButton.dataset.label || "");
+      return;
+    }
+
+    const clearButton = event.target.closest("[data-action='markers-clear']");
+    if (clearButton) {
+      const card = clearButton.closest("[data-song-id]");
+      const song = state.songs.find((entry) => entry.id === card?.dataset.songId);
+      if (!song) return;
+      clearMarkers(song);
+      return;
+    }
+
+    const markerToRemove = event.target.closest("[data-action='marker-remove']");
+    if (markerToRemove) {
+      const frame = markerToRemove.closest("[data-action='marker-place']");
+      const song = state.songs.find((entry) => entry.id === frame?.dataset.songId);
+      if (!song) return;
+      removeMarker(song, markerToRemove.dataset.markerId);
+      return;
+    }
+
+    const markerFrame = event.target.closest("[data-action='marker-place']");
+    if (!markerFrame || !activeMarker.label || activeMarker.songId !== markerFrame.dataset.songId) return;
+    const song = state.songs.find((entry) => entry.id === markerFrame.dataset.songId);
+    if (!song) return;
+    const rect = markerFrame.getBoundingClientRect();
+    addMarker(song, (event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
   });
 
   document.body.addEventListener("input", (event) => {

@@ -455,6 +455,34 @@ textarea {
   align-content: end;
 }
 
+.marker-toolbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.marker-tool {
+  min-height: 34px;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.marker-tool.active {
+  border-color: rgba(15, 118, 110, 0.5);
+  background: #dff4ef;
+  color: var(--accent-dark);
+}
+
+.marker-clear {
+  grid-column: 1 / -1;
+  color: #475467;
+}
+
 .sheet-preview-mini {
   display: grid;
   min-height: 132px;
@@ -717,6 +745,31 @@ textarea {
   height: 100%;
   min-height: 0;
   overflow: hidden;
+}
+
+.sheet-marker-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sheet-marker {
+  position: absolute;
+  z-index: 3;
+  min-width: 26px;
+  min-height: 24px;
+  padding: 3px 7px;
+  border: 1.5px solid #111827;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111827;
+  font-size: 13px;
+  font-weight: 950;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  box-shadow: 0 2px 5px rgba(17, 24, 39, 0.18);
 }
 
 .sheet-frame img {
