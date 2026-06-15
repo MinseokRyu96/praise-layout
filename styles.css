@@ -158,11 +158,18 @@ a:focus-visible {
   display: grid;
   grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
+  height: calc(100vh - 128px);
+  min-height: min(620px, calc(100vh - 128px));
+  overflow: hidden;
 }
 
 .editor-column {
+  height: 100%;
   min-width: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-gutter: stable;
 }
 
 .eyebrow {
@@ -249,8 +256,10 @@ button:disabled {
 .split-workbench .preview-section {
   position: sticky;
   top: 20px;
-  max-height: calc(100vh - 40px);
+  height: 100%;
+  max-height: none;
   overflow: auto;
+  margin-bottom: 0;
 }
 
 .intro-panel {
@@ -1032,10 +1041,20 @@ textarea {
 @media (max-width: 1180px) {
   .split-workbench {
     grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .editor-column {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .split-workbench .preview-section {
     position: static;
+    height: auto;
     max-height: none;
     overflow: visible;
   }
@@ -1294,13 +1313,26 @@ html.force-desktop .preview-section {
 
 html.force-desktop .split-workbench {
   grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
+  align-items: stretch;
+  height: calc(100vh - 128px);
+  min-height: min(620px, calc(100vh - 128px));
+  overflow: hidden;
+}
+
+html.force-desktop .editor-column {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-gutter: stable;
 }
 
 html.force-desktop .split-workbench .preview-section {
   position: sticky;
   top: 20px;
-  max-height: calc(100vh - 40px);
+  height: 100%;
+  max-height: none;
   overflow: auto;
+  margin-bottom: 0;
 }
 
 html.force-desktop .site-footer {
