@@ -90,9 +90,17 @@ const els = {
   fileNameHint: document.querySelector("#fileNameHint"),
 };
 
+function createId() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  const randomPart = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(2)).join("") : Math.random().toString(36).slice(2);
+  return `id-${Date.now().toString(36)}-${randomPart}`;
+}
+
 function createSong(index) {
   return {
-    id: crypto.randomUUID(),
+    id: createId(),
     order: index + 1,
     title: "",
     key: "",
@@ -896,7 +904,7 @@ function clampMarkerValue(value) {
 function addMarker(song, label, x, y) {
   song.markers = getSongMarkers(song);
   song.markers.push({
-    id: crypto.randomUUID(),
+    id: createId(),
     label,
     x: clampMarkerValue(x),
     y: clampMarkerValue(y),
@@ -925,7 +933,7 @@ function moveMarker(song, markerId, x, y) {
 async function handleFileList(fileList, songId = "") {
   for (const file of [...fileList]) {
     const item = {
-      id: crypto.randomUUID(),
+      id: createId(),
       name: file.name,
       type: file.type,
       size: file.size,
