@@ -69,9 +69,12 @@ const keyOptions = [
   "Bm",
 ];
 const markerOptions = ["V", "Ch", "P.C", "Br"];
-let activeMarker = {
+let draggingMarker = {
   songId: "",
-  label: "",
+  markerId: "",
+  frame: null,
+  marker: null,
+  pointerId: 0,
 };
 const els = {
   setlistTitle: document.querySelector("#setlistTitle"),
@@ -366,7 +369,7 @@ function renderSongs() {
               ${markerOptions
                 .map(
                   (label) =>
-                    `<button data-action="marker-select" data-label="${escapeHtml(label)}" class="marker-tool ${activeMarker.songId === song.id && activeMarker.label === label ? "active" : ""}" type="button">${escapeHtml(label)}</button>`,
+                    `<button data-action="marker-select" data-label="${escapeHtml(label)}" class="marker-tool" type="button">${escapeHtml(label)}</button>`,
                 )
                 .join("")}
               <button data-action="markers-clear" class="marker-tool marker-clear" type="button">마커 삭제</button>
@@ -400,11 +403,11 @@ function renderMarkers(song) {
       (marker) => `
         <button
           class="sheet-marker"
-          data-action="marker-remove"
+          data-action="marker-drag"
           data-marker-id="${escapeHtml(marker.id)}"
           type="button"
           style="left: ${Number(marker.x || 0) * 100}%; top: ${Number(marker.y || 0) * 100}%"
-          aria-label="${escapeHtml(marker.label)} 마커 삭제"
+          aria-label="${escapeHtml(marker.label)} 마커 이동"
         >${escapeHtml(marker.label)}</button>
       `,
     )
@@ -891,19 +894,11 @@ function clampMarkerValue(value) {
   return Math.max(0.02, Math.min(0.98, value));
 }
 
-function setActiveMarker(songId, label) {
-  activeMarker = {
-    songId,
-    label,
-  };
-  renderSongs();
-}
-
-function addMarker(song, x, y) {
+function addMarker(song, label, x, y) {
   song.markers = getSongMarkers(song);
   song.markers.push({
     id: crypto.randomUUID(),
-    label: activeMarker.label,
+    label,
     x: clampMarkerValue(x),
     y: clampMarkerValue(y),
   });
@@ -918,6 +913,14 @@ function removeMarker(song, markerId) {
 function clearMarkers(song) {
   song.markers = [];
   render();
+}
+
+function moveMarker(song, markerId, x, y) {
+  const marker = getSongMarkers(song).find((entry) => entry.id === markerId);
+  if (!marker) return null;
+  marker.x = clampMarkerValue(x);
+  marker.y = clampMarkerValue(y);
+  return marker;
 }
 
 async function handleFileList(fileList, songId = "") {
@@ -1004,7 +1007,12 @@ function bindEvents() {
     if (markerButton) {
       const card = markerButton.closest("[data-song-id]");
       if (!card) return;
-      setActiveMarker(card.dataset.songId, markerButton.dataset.label || "");
+      const song = state.songs.find((entry) => entry.id === card.dataset.songId);
+      if (!song) return;
+      const markerCount = getSongMarkers(song).length;
+      const offset = ((markerCount % 5) - 2) * 0.035;
+      addMarker(song, markerButton.dataset.label || "", 0.5 + offset, 0.45 + offset);
+      document.querySelector("#preview")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
@@ -1016,22 +1024,59 @@ function bindEvents() {
       clearMarkers(song);
       return;
     }
+  });
 
-    const markerToRemove = event.target.closest("[data-action='marker-remove']");
-    if (markerToRemove) {
-      const frame = markerToRemove.closest("[data-action='marker-place']");
-      const song = state.songs.find((entry) => entry.id === frame?.dataset.songId);
-      if (!song) return;
-      removeMarker(song, markerToRemove.dataset.markerId);
-      return;
-    }
+  document.body.addEventListener("pointerdown", (event) => {
+    const marker = event.target.closest("[data-action='marker-drag']");
+    if (!marker) return;
+    const frame = marker.closest("[data-action='marker-place']");
+    if (!frame) return;
+    draggingMarker = {
+      songId: frame.dataset.songId,
+      markerId: marker.dataset.markerId,
+      frame,
+      marker,
+      pointerId: event.pointerId,
+    };
+    marker.setPointerCapture?.(event.pointerId);
+    marker.classList.add("dragging");
+    event.preventDefault();
+  });
 
-    const markerFrame = event.target.closest("[data-action='marker-place']");
-    if (!markerFrame || !activeMarker.label || activeMarker.songId !== markerFrame.dataset.songId) return;
-    const song = state.songs.find((entry) => entry.id === markerFrame.dataset.songId);
+  document.body.addEventListener("pointermove", (event) => {
+    if (!draggingMarker.marker || event.pointerId !== draggingMarker.pointerId) return;
+    const song = state.songs.find((entry) => entry.id === draggingMarker.songId);
     if (!song) return;
-    const rect = markerFrame.getBoundingClientRect();
-    addMarker(song, (event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+    const rect = draggingMarker.frame.getBoundingClientRect();
+    const marker = moveMarker(song, draggingMarker.markerId, (event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+    if (!marker) return;
+    draggingMarker.marker.style.left = `${marker.x * 100}%`;
+    draggingMarker.marker.style.top = `${marker.y * 100}%`;
+    event.preventDefault();
+  });
+
+  document.body.addEventListener("pointerup", (event) => {
+    if (!draggingMarker.marker || event.pointerId !== draggingMarker.pointerId) return;
+    draggingMarker.marker.classList.remove("dragging");
+    saveSnapshot();
+    draggingMarker = {
+      songId: "",
+      markerId: "",
+      frame: null,
+      marker: null,
+      pointerId: 0,
+    };
+  });
+
+  document.body.addEventListener("pointercancel", () => {
+    if (draggingMarker.marker) draggingMarker.marker.classList.remove("dragging");
+    draggingMarker = {
+      songId: "",
+      markerId: "",
+      frame: null,
+      marker: null,
+      pointerId: 0,
+    };
   });
 
   document.body.addEventListener("input", (event) => {
