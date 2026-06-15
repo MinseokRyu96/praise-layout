@@ -6,14 +6,14 @@
     <title>사용 가이드 | PraiseLayout</title>
     <meta
       name="description"
-      content="찬양 콘티를 A3 악보 PDF와 JPG로 정리하는 방법, 추천 설정, 리허설 체크리스트, 자주 묻는 질문을 안내합니다."
+      content="찬양 콘티, Key, 흐름 메모, 악보 위 V/Ch/P.C/Br 마커를 A3 PDF와 JPG로 정리하는 방법을 안내합니다."
     />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://praise-layout.vercel.app/guide" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="PraiseLayout" />
     <meta property="og:title" content="사용 가이드 | PraiseLayout" />
-    <meta property="og:description" content="찬양 콘티를 A3 악보 PDF와 JPG로 정리하는 방법을 안내합니다." />
+    <meta property="og:description" content="찬양 콘티와 악보 이미지를 A3 PDF/JPG로 정리하고 섹션 마커를 표시하는 방법을 안내합니다." />
     <meta property="og:url" content="https://praise-layout.vercel.app/guide" />
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#0f766e" />
@@ -41,6 +41,14 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "인쇄와 보관에는 PDF가 적합하고, 휴대폰 갤러리나 메신저로 빠르게 공유할 때는 JPG가 편합니다. PraiseLayout의 JPG 다운로드는 페이지별 이미지로 저장됩니다."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "악보 위에 Verse나 Chorus 마커를 표시할 수 있나요?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "V, Ch, P.C, Br 마커를 추가해 A3 미리보기의 악보 위에 표시할 수 있습니다. 추가된 마커는 드래그로 위치를 조정하고, 더블클릭으로 삭제할 수 있으며 PDF와 JPG 출력에도 반영됩니다."
             }
           },
           {
@@ -93,8 +101,8 @@
         <p class="eyebrow">Guide</p>
         <h1>찬양 콘티를 A3 악보로 만드는 방법</h1>
         <p class="lead">
-          PraiseLayout은 찬양 콘티와 악보 이미지를 한 화면에서 정리해 예배팀이 바로 인쇄하거나 모바일로
-          공유할 수 있는 PDF와 JPG 파일을 만드는 도구입니다.
+          PraiseLayout은 찬양 콘티와 악보 이미지를 한 화면에서 정리하고, Key와 흐름 메모, 악보 위 섹션
+          마커까지 함께 표시해 예배팀이 바로 인쇄하거나 모바일로 공유할 수 있는 PDF와 JPG 파일을 만드는 도구입니다.
         </p>
       </section>
 
@@ -102,25 +110,27 @@
         <a href="#use-cases">1. 사용 상황</a>
         <a href="#setlist-info">2. 콘티 정보</a>
         <a href="#song-assets">3. 곡 정보와 악보</a>
-        <a href="#layout-settings">4. 추천 설정</a>
-        <a href="#download-types">5. PDF와 JPG</a>
-        <a href="#checklist">6. 체크리스트</a>
-        <a href="#copyright">7. 사용 권한</a>
-        <a href="#faq">8. FAQ</a>
+        <a href="#sheet-markers">4. 악보 마커</a>
+        <a href="#layout-settings">5. 추천 설정</a>
+        <a href="#download-types">6. PDF와 JPG</a>
+        <a href="#checklist">7. 체크리스트</a>
+        <a href="#copyright">8. 사용 권한</a>
+        <a href="#faq">9. FAQ</a>
       </nav>
 
       <section id="use-cases" class="content-section">
         <h2>1. PraiseLayout은 어떤 상황에 쓰나요?</h2>
         <p>
           예배 전 리허설 자료를 급하게 정리해야 하거나, 여러 곡의 악보를 A3 한 장에 보기 좋게 모아야 할 때
-          사용할 수 있습니다. 인도자, 싱어, 밴드 멤버가 같은 콘티 흐름을 보고 준비하도록 곡 순서와 악보를
-          한 파일로 정리하는 데 초점을 둡니다.
+          사용할 수 있습니다. 인도자, 싱어, 밴드 멤버가 같은 콘티 흐름과 악보 위 섹션 표시를 보고 준비하도록
+          곡 순서와 악보를 한 파일로 정리하는 데 초점을 둡니다.
         </p>
         <ul class="content-list">
           <li>주일예배, 수요예배, 금요기도회 등 예배별 찬양 콘티 정리</li>
           <li>리허설 전에 싱어와 밴드에게 악보 이미지를 빠르게 공유</li>
           <li>A3 인쇄용 PDF와 모바일 확인용 JPG를 한 번에 준비</li>
-          <li>곡별 인트로, 반복, 엔딩 등 흐름 메모를 악보와 함께 보관</li>
+          <li>곡별 Key, 인트로, 반복, 엔딩 등 흐름 메모를 악보와 함께 보관</li>
+          <li>Verse, Chorus, Pre-Chorus, Bridge 위치를 악보 위 마커로 표시</li>
         </ul>
       </section>
 
@@ -140,19 +150,35 @@
       <section id="song-assets" class="content-section">
         <h2>3. 곡 정보와 악보 이미지 준비하기</h2>
         <p>
-          곡명은 악보 영역의 제목으로 표시되고, 곡 흐름 메모는 리허설 중 확인해야 할 진행 정보를 적는 공간입니다.
-          악보 이미지는 글자와 코드가 선명한 파일을 사용하는 것이 좋습니다.
+          곡명과 Key는 악보 영역의 제목 정보로 표시되고, 곡 흐름 메모는 리허설 중 확인해야 할 진행 정보를 적는
+          공간입니다. 악보 이미지는 글자와 코드가 선명한 파일을 사용하는 것이 좋습니다.
         </p>
         <ul class="content-list">
           <li>곡명은 실제 콘티 순서대로 입력합니다.</li>
+          <li>Key는 곡명 입력 필드 오른쪽에서 선택해 곡 제목과 함께 표시합니다.</li>
           <li>흐름 메모에는 Intro, Verse, Chorus, Bridge, Ending처럼 팀이 합의한 용어를 사용합니다.</li>
           <li>악보 이미지는 그림자가 적고 여백이 과하지 않은 파일이 A3 배치에서 더 잘 보입니다.</li>
           <li>PDF 악보는 브라우저 미리보기 제약이 있을 수 있어, 가능하면 JPG나 PNG 이미지로 준비하는 것을 권장합니다.</li>
         </ul>
       </section>
 
+      <section id="sheet-markers" class="content-section">
+        <h2>4. 악보 위 섹션 마커 표시하기</h2>
+        <p>
+          악보를 업로드한 뒤 곡 카드의 V, Ch, P.C, Br 버튼을 누르면 하단 A3 미리보기의 악보 위에 마커가
+          추가됩니다. 추가된 마커는 직접 드래그해 원하는 위치로 옮길 수 있습니다.
+        </p>
+        <ul class="content-list">
+          <li>V: Verse 위치를 표시할 때 사용합니다.</li>
+          <li>Ch: Chorus 진입 위치를 표시할 때 사용합니다.</li>
+          <li>P.C: Pre-Chorus 또는 프리코러스 위치를 표시할 때 사용합니다.</li>
+          <li>Br: Bridge 위치를 표시할 때 사용합니다.</li>
+          <li>마커를 더블클릭하면 개별 삭제되고, 마커 삭제 버튼을 누르면 해당 곡의 마커가 모두 삭제됩니다.</li>
+        </ul>
+      </section>
+
       <section id="layout-settings" class="content-section">
-        <h2>4. A3 레이아웃 추천 설정</h2>
+        <h2>5. A3 레이아웃 추천 설정</h2>
         <p>
           A3 한 장에 너무 많은 곡을 넣으면 코드와 가사가 작아질 수 있습니다. 실제 사용 목적에 따라 방향,
           장당 곡 수, 여백을 조합해 보세요.
@@ -178,10 +204,10 @@
       </section>
 
       <section id="download-types" class="content-section">
-        <h2>5. PDF와 JPG 다운로드 차이</h2>
+        <h2>6. PDF와 JPG 다운로드 차이</h2>
         <p>
-          PDF는 인쇄와 보관에 적합하고, JPG는 휴대폰에서 바로 확인하거나 메신저로 공유하기 좋습니다. 팀의
-          사용 방식에 맞춰 둘 중 하나를 선택하거나 둘 다 저장해 두면 안전합니다.
+          PDF는 인쇄와 보관에 적합하고, JPG는 휴대폰에서 바로 확인하거나 메신저로 공유하기 좋습니다. 곡명, Key,
+          흐름 메모, 악보 위 마커는 다운로드 결과에 함께 반영됩니다.
         </p>
         <ul class="content-list">
           <li>PDF 다운로드: A3 프린터 출력, 태블릿 보관, 예배 자료 아카이브에 적합합니다.</li>
@@ -191,7 +217,7 @@
       </section>
 
       <section id="checklist" class="content-section">
-        <h2>6. 찬양팀 리허설 전 체크리스트</h2>
+        <h2>7. 찬양팀 리허설 전 체크리스트</h2>
         <p>
           악보 파일을 만들기 전 아래 항목을 확인하면 리허설 중 수정 시간을 줄일 수 있습니다.
         </p>
@@ -199,6 +225,7 @@
           <li>곡 순서와 키가 최종 확정되었는지 확인</li>
           <li>템포, 박자, 인트로 길이, 엔딩 방식을 팀과 공유</li>
           <li>반복 구간과 브릿지 진입 시점을 흐름 메모에 기록</li>
+          <li>Verse, Chorus, Pre-Chorus, Bridge 위치가 악보 위 마커로 잘 표시되었는지 확인</li>
           <li>싱어, 건반, 기타, 드럼 등 파트별로 필요한 악보가 같은지 확인</li>
           <li>악보 이미지가 너무 흐리거나 잘린 부분이 없는지 확인</li>
           <li>PDF 인쇄본과 JPG 공유본을 리허설 전에 미리 전달</li>
@@ -206,7 +233,7 @@
       </section>
 
       <section id="copyright" class="content-section">
-        <h2>7. 악보 파일 사용 권한 안내</h2>
+        <h2>8. 악보 파일 사용 권한 안내</h2>
         <p>
           PraiseLayout은 악보를 제공하거나 판매하는 서비스가 아니라, 사용자가 보유한 악보 파일을 정리하는
           레이아웃 도구입니다. 업로드하는 악보와 이미지는 반드시 사용 권한을 가진 자료여야 하며, 교회와 팀의
@@ -219,7 +246,7 @@
       </section>
 
       <section id="faq" class="content-section">
-        <h2>8. 자주 묻는 질문</h2>
+        <h2>9. 자주 묻는 질문</h2>
         <div class="faq-list">
           <article class="faq-item">
             <h3>A3 한 장에 몇 곡을 넣는 게 좋나요?</h3>
@@ -233,6 +260,13 @@
             <p>
               인쇄와 보관에는 PDF가 좋고, 휴대폰 갤러리나 메신저 공유에는 JPG가 편합니다. JPG는 페이지별 이미지로
               저장됩니다.
+            </p>
+          </article>
+          <article class="faq-item">
+            <h3>악보 위에 Verse나 Chorus 마커를 표시할 수 있나요?</h3>
+            <p>
+              V, Ch, P.C, Br 마커를 추가해 악보 위에 표시할 수 있습니다. 마커는 하단 A3 미리보기에서 직접
+              드래그해 위치를 조정하고, 더블클릭으로 삭제할 수 있습니다.
             </p>
           </article>
           <article class="faq-item">
