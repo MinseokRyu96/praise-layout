@@ -443,104 +443,6 @@ textarea {
   font-weight: 900;
 }
 
-.song-source-row,
-.song-analysis-row,
-.recommendation-input-row {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.song-source-row {
-  grid-template-columns: minmax(0, 1fr) 118px;
-}
-
-.song-analysis-row {
-  grid-template-columns: 148px minmax(0, 1fr);
-  align-items: center;
-}
-
-.song-recommendation-box {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-  padding: 11px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fbfcfe;
-}
-
-.recommendation-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.recommendation-head strong {
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.recommendation-head span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.recommendation-input-row {
-  grid-template-columns: minmax(0, 1fr) 92px;
-  align-items: stretch;
-}
-
-.song-recommendation-box textarea {
-  min-height: 64px;
-  line-height: 1.45;
-}
-
-.recommendation-result {
-  max-height: 220px;
-  overflow: auto;
-  margin: 0;
-  padding: 10px;
-  border: 1px solid #edf0f5;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #344054;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 750;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
-.mini-button {
-  min-height: 42px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #ffffff;
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.key-audio-drop {
-  min-height: 42px;
-  padding: 9px 10px;
-  font-size: 13px;
-}
-
-.analysis-status {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.45;
-}
-
 .upload-panel {
   display: grid;
   gap: 8px;
@@ -593,10 +495,7 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .title-key-grid,
-  .song-source-row,
-  .song-analysis-row,
-  .recommendation-input-row {
+  .title-key-grid {
     grid-template-columns: 1fr;
   }
 
@@ -839,7 +738,7 @@ textarea {
   border-top: 1px solid #edf0f5;
   background: #fbfcfe;
   color: #111827;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1.3;
   white-space: pre-wrap;
@@ -1159,10 +1058,7 @@ textarea {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .title-key-grid,
-  .song-source-row,
-  .song-analysis-row,
-  .recommendation-input-row {
+  .title-key-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

@@ -68,58 +68,6 @@ const keyOptions = [
   "Bbm",
   "Bm",
 ];
-const recommendationCatalog = [
-  { title: "주 은혜임을", key: "E", tags: ["은혜", "고백", "회복", "잔잔"], reason: "은혜를 고백하는 흐름에 자연스럽게 이어집니다." },
-  { title: "시간을 뚫고", key: "D", tags: ["기다림", "신뢰", "고백", "잔잔"], reason: "하나님의 일하심을 신뢰하는 분위기와 잘 맞습니다." },
-  { title: "주님의 시선", key: "F", tags: ["헌신", "시선", "고백", "잔잔"], reason: "헌신과 고백 중심의 콘티에서 연결감이 좋습니다." },
-  { title: "나는 주를 섬기는 것에 후회가 없습니다", key: "F", tags: ["헌신", "결단", "고백", "회복"], reason: "섬김과 결단의 메시지를 강하게 이어갈 수 있습니다." },
-  { title: "원하고 바라고 기도합니다", key: "F", tags: ["기도", "소망", "고백", "잔잔"], reason: "기도와 소망의 주제를 부드럽게 확장합니다." },
-  { title: "Way Maker", key: "E", tags: ["신뢰", "선포", "소망", "예배"], reason: "하나님의 길을 선포하는 분위기로 전환하기 좋습니다." },
-  { title: "주가 일하시네", key: "C", tags: ["신뢰", "소망", "고백", "잔잔"], reason: "기다림과 신뢰의 메시지를 같은 결로 이어줍니다." },
-  { title: "예수 아름다우신", key: "A", tags: ["예수", "경배", "찬양", "잔잔"], reason: "예수님께 초점을 모으는 경배 흐름에 적합합니다." },
-  { title: "아무것도 두려워 말라", key: "C", tags: ["위로", "평안", "신뢰", "회복"], reason: "위로와 평안의 메시지가 필요한 콘티에 잘 맞습니다." },
-  { title: "꽃들도", key: "D", tags: ["감사", "소망", "고백", "잔잔"], reason: "감사와 소망을 차분하게 고백하는 흐름을 만듭니다." },
-  { title: "하나님의 부르심", key: "E", tags: ["부르심", "헌신", "결단", "고백"], reason: "부르심과 헌신의 주제를 분명하게 이어줍니다." },
-  { title: "나의 한숨을 바꾸셨네", key: "C", tags: ["회복", "위로", "은혜", "소망"], reason: "회복과 위로가 필요한 예배 흐름에 적합합니다." },
-  { title: "주의 나라가 임할 때", key: "D", tags: ["선포", "하나님나라", "부흥", "예배"], reason: "공동체적 선포와 부흥의 에너지를 살릴 수 있습니다." },
-  { title: "나는 예배자입니다", key: "F", tags: ["예배", "정체성", "고백", "헌신"], reason: "예배자로 서는 고백을 명확하게 이어줍니다." },
-  { title: "내 모습 이대로", key: "E", tags: ["은혜", "회복", "고백", "잔잔"], reason: "있는 모습 그대로 나아가는 고백과 잘 맞습니다." },
-  { title: "마라나타", key: "G", tags: ["소망", "재림", "선포", "예배"], reason: "소망과 선포의 방향으로 예배를 끌어올립니다." },
-  { title: "주만 의지해", key: "G", tags: ["신뢰", "고백", "평안", "잔잔"], reason: "하나님만 의지하는 메시지를 단순하게 이어줍니다." },
-  { title: "은혜", key: "C", tags: ["은혜", "감사", "고백", "회복"], reason: "은혜와 감사의 주제를 직접적으로 강화합니다." },
-  { title: "충만", key: "D", tags: ["성령", "충만", "기도", "예배"], reason: "성령의 임재와 충만을 구하는 흐름에 적합합니다." },
-  { title: "주 품에", key: "G", tags: ["위로", "평안", "신뢰", "잔잔"], reason: "평안과 위로의 분위기를 안정적으로 이어줍니다." },
-  { title: "내 삶의 이유라", key: "E", tags: ["예수", "고백", "헌신", "예배"], reason: "예수님을 삶의 이유로 고백하는 메시지와 연결됩니다." },
-  { title: "그 사랑", key: "G", tags: ["사랑", "십자가", "은혜", "고백"], reason: "십자가 사랑과 은혜의 주제를 깊게 이어갑니다." },
-  { title: "찬양하세", key: "A", tags: ["기쁨", "찬양", "선포", "빠른"], reason: "밝고 힘 있는 찬양 흐름으로 전환하기 좋습니다." },
-  { title: "기뻐하며 왕께", key: "G", tags: ["기쁨", "찬양", "선포", "빠른"], reason: "예배 초반의 기쁨과 선포 분위기에 잘 맞습니다." },
-  { title: "예수 열방의 소망", key: "A", tags: ["예수", "소망", "선포", "찬양"], reason: "예수님을 소망으로 선포하는 흐름을 만들 수 있습니다." },
-  { title: "나 주님의 기쁨되기 원하네", key: "G", tags: ["헌신", "고백", "결단", "잔잔"], reason: "헌신과 순종의 결단으로 자연스럽게 이어집니다." },
-];
-const recommendationKeywordMap = {
-  감사: ["감사", "은혜", "기쁨"],
-  기도: ["기도", "소망", "신뢰"],
-  기쁨: ["기쁨", "찬양", "빠른", "선포"],
-  빠른: ["빠른", "기쁨", "찬양", "선포"],
-  밝은: ["기쁨", "찬양", "빠른"],
-  선포: ["선포", "찬양", "예배"],
-  은혜: ["은혜", "감사", "회복"],
-  회복: ["회복", "위로", "은혜"],
-  위로: ["위로", "평안", "회복"],
-  평안: ["평안", "위로", "신뢰"],
-  신뢰: ["신뢰", "소망", "고백"],
-  소망: ["소망", "신뢰", "선포"],
-  헌신: ["헌신", "결단", "고백"],
-  결단: ["결단", "헌신", "고백"],
-  예배: ["예배", "고백", "경배"],
-  경배: ["경배", "예배", "예수"],
-  예수: ["예수", "경배", "고백"],
-  십자가: ["십자가", "사랑", "은혜"],
-  사랑: ["사랑", "은혜", "고백"],
-  성령: ["성령", "충만", "기도"],
-  부흥: ["부흥", "선포", "하나님나라"],
-};
-
 const els = {
   setlistTitle: document.querySelector("#setlistTitle"),
   worshipDate: document.querySelector("#worshipDate"),
@@ -140,11 +88,6 @@ function createSong(index) {
     order: index + 1,
     title: "",
     key: "",
-    youtubeUrl: "",
-    recommendationHint: "",
-    recommendationResult: "",
-    recommendationStatus: "",
-    analysisStatus: "",
     flow: "",
     fileId: "",
   };
@@ -397,25 +340,6 @@ function renderSongs() {
                 </label>
               </div>
             </div>
-            <div class="song-analysis-row">
-              <label class="file-drop key-audio-drop">
-                <input data-action="key-audio-upload" type="file" accept="audio/*" />
-                오디오로 Key 추정
-              </label>
-              <span class="analysis-status">${escapeHtml(song.analysisStatus || "Key는 직접 선택하거나 오디오 파일로 추정할 수 있습니다.")}</span>
-            </div>
-            <div class="song-recommendation-box">
-              <div class="recommendation-head">
-                <strong>비슷한 찬양 추천</strong>
-                <span>자동 추천</span>
-              </div>
-              <div class="recommendation-input-row">
-                <textarea data-field="recommendationHint" rows="2" aria-label="추천 힌트" placeholder="분위기, 주제, 가사 일부를 적으면 추천 정확도가 올라갑니다">${escapeHtml(song.recommendationHint)}</textarea>
-                <button data-action="song-recommend" class="mini-button" type="button">추천받기</button>
-              </div>
-              <span class="analysis-status">${escapeHtml(song.recommendationStatus || "곡명, Key, 추천 힌트를 기준으로 앱 안에서 바로 추천합니다.")}</span>
-              ${song.recommendationResult ? `<pre class="recommendation-result">${escapeHtml(song.recommendationResult)}</pre>` : ""}
-            </div>
             <label class="field-block flow-field">
               <span>곡 흐름</span>
               <textarea data-field="flow" rows="4" placeholder="예: Intro 2마디 → Verse 1 → Chorus x2 → Bridge → Chorus">${escapeHtml(song.flow)}</textarea>
@@ -617,8 +541,8 @@ async function drawJpgSlot(ctx, song, rect, scale) {
   let flowHeight = 0;
   if (hasFlow) {
     const flowPadding = 10 * scale;
-    ctx.font = `800 ${24 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-    const lineHeight = 31 * scale;
+    ctx.font = `800 ${20 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    const lineHeight = 26 * scale;
     const flowLines = getWrappedLines(ctx, song.flow, rect.width - flowPadding * 2, 4);
     flowHeight = Math.min(rect.height * 0.48, flowLines.length * lineHeight + flowPadding * 2);
     contentHeight -= flowHeight;
@@ -643,9 +567,9 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.lineTo(rect.x + rect.width, flowY);
     ctx.stroke();
     ctx.fillStyle = "#111827";
-    ctx.font = `800 ${24 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = `800 ${20 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
     ctx.textBaseline = "top";
-    drawWrappedText(ctx, song.flow, rect.x + 10 * scale, flowY + 8 * scale, rect.width - 20 * scale, 31 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (31 * scale))));
+    drawWrappedText(ctx, song.flow, rect.x + 10 * scale, flowY + 8 * scale, rect.width - 20 * scale, 26 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (26 * scale))));
   }
 
   ctx.restore();
@@ -877,245 +801,6 @@ function readFileAsDataUrl(file) {
   });
 }
 
-function normalizeKeyName(value) {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
-  const normalized = raw.replace(/♯/g, "#").replace(/♭/g, "b");
-  const match = normalized.match(/^([A-Ga-g])([#b]?)(m?)$/);
-  if (!match) return "";
-  return `${match[1].toUpperCase()}${match[2]}${match[3] ? "m" : ""}`;
-}
-
-function normalizeRecommendationText(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[^\uac00-\ud7a3a-z0-9#b\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function getRecommendationTags(song) {
-  const text = normalizeRecommendationText([song.title, song.recommendationHint, song.flow].filter(Boolean).join(" "));
-  const tags = new Set();
-
-  Object.entries(recommendationKeywordMap).forEach(([keyword, mappedTags]) => {
-    if (!text.includes(keyword)) return;
-    mappedTags.forEach((tag) => tags.add(tag));
-  });
-
-  recommendationCatalog.forEach((item) => {
-    if (!text || !normalizeRecommendationText(item.title).includes(text)) return;
-    item.tags.forEach((tag) => tags.add(tag));
-  });
-
-  return [...tags];
-}
-
-function getRecommendedSongs(song) {
-  const tags = getRecommendationTags(song);
-  const currentTitle = normalizeRecommendationText(song.title);
-  const normalizedHint = normalizeRecommendationText(song.recommendationHint);
-  const hasInput = Boolean(currentTitle || normalizedHint || song.key);
-
-  if (!hasInput) return [];
-
-  return recommendationCatalog
-    .map((item, index) => {
-      const sameTitle = currentTitle && normalizeRecommendationText(item.title) === currentTitle;
-      const tagScore = item.tags.reduce((score, tag) => score + (tags.includes(tag) ? 4 : 0), 0);
-      const keyScore = song.key && item.key === song.key ? 2 : 0;
-      const titleScore =
-        currentTitle &&
-        item.tags.some((tag) => currentTitle.includes(tag)) ? 2 : 0;
-      const fallbackScore = tags.length ? 0 : Math.max(0, recommendationCatalog.length - index) / 100;
-      return {
-        ...item,
-        score: sameTitle ? -1 : tagScore + keyScore + titleScore + fallbackScore,
-      };
-    })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, "ko"))
-    .slice(0, 5);
-}
-
-function formatRecommendations(recommendations, song) {
-  const basis = [
-    song.title ? `곡명: ${song.title}` : "",
-    song.key ? `Key: ${song.key}` : "",
-    song.recommendationHint ? `힌트: ${song.recommendationHint}` : "",
-  ].filter(Boolean);
-
-  return [
-    `추천 기준: ${basis.join(" / ")}`,
-    "",
-    ...recommendations.map(
-      (item, index) => `${index + 1}. ${item.title} - ${item.reason} - Key 후보: ${item.key}`,
-    ),
-    "",
-    "콘티 팁: 현재 곡의 메시지와 같은 태그를 가진 곡을 앞뒤에 배치하면 예배 흐름이 덜 끊깁니다.",
-  ].join("\n");
-}
-
-function handleSongRecommendation(song) {
-  const recommendations = getRecommendedSongs(song);
-  if (!recommendations.length) {
-    song.recommendationStatus = "곡명, Key 또는 추천 힌트를 입력해주세요.";
-    song.recommendationResult = "";
-    renderSongs();
-    return;
-  }
-
-  song.recommendationResult = formatRecommendations(recommendations, song);
-  song.recommendationStatus = "앱 내부 추천 목록에서 비슷한 찬양을 골랐습니다.";
-  render();
-}
-
-async function analyzeAudioKey(file) {
-  const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextConstructor) throw new Error("Web Audio is not available.");
-
-  const audioContext = new AudioContextConstructor();
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    const sampleRate = audioBuffer.sampleRate;
-    const duration = audioBuffer.duration;
-    const frameSize = 4096;
-    const stepSize = Math.max(frameSize, Math.floor(sampleRate * 1.2));
-    const start = duration > 35 ? Math.floor(sampleRate * 5) : 0;
-    const end = Math.min(audioBuffer.length - frameSize, start + Math.floor(sampleRate * 120));
-    const chroma = Array(12).fill(0);
-    let analyzedFrames = 0;
-
-    for (let offset = start; offset < end && analyzedFrames < 72; offset += stepSize) {
-      const frame = getMonoFrame(audioBuffer, offset, frameSize);
-      const rms = getRms(frame);
-      if (rms < 0.012) continue;
-
-      const pitch = detectPitch(frame, sampleRate);
-      if (!pitch) continue;
-
-      const midi = Math.round(69 + 12 * Math.log2(pitch.frequency / 440));
-      const pitchClass = ((midi % 12) + 12) % 12;
-      chroma[pitchClass] += pitch.confidence * rms;
-      analyzedFrames += 1;
-    }
-
-    if (!chroma.some(Boolean)) {
-      throw new Error("Could not detect tonal content.");
-    }
-
-    return estimateKeyFromChroma(chroma);
-  } finally {
-    audioContext.close?.().catch(() => {});
-  }
-}
-
-function getMonoFrame(audioBuffer, offset, frameSize) {
-  const frame = new Float32Array(frameSize);
-  const channelCount = Math.min(audioBuffer.numberOfChannels, 2);
-  for (let channel = 0; channel < channelCount; channel += 1) {
-    const data = audioBuffer.getChannelData(channel);
-    for (let index = 0; index < frameSize; index += 1) {
-      frame[index] += (data[offset + index] || 0) / channelCount;
-    }
-  }
-  return frame;
-}
-
-function getRms(frame) {
-  let sum = 0;
-  for (let index = 0; index < frame.length; index += 1) {
-    sum += frame[index] * frame[index];
-  }
-  return Math.sqrt(sum / frame.length);
-}
-
-function detectPitch(frame, sampleRate) {
-  const minFrequency = 70;
-  const maxFrequency = 700;
-  const minLag = Math.floor(sampleRate / maxFrequency);
-  const maxLag = Math.min(Math.floor(sampleRate / minFrequency), frame.length - 1);
-  let bestLag = 0;
-  let bestCorrelation = 0;
-
-  for (let lag = minLag; lag <= maxLag; lag += 1) {
-    let correlation = 0;
-    let energyA = 0;
-    let energyB = 0;
-
-    for (let index = 0; index < frame.length - lag; index += 1) {
-      const a = frame[index];
-      const b = frame[index + lag];
-      correlation += a * b;
-      energyA += a * a;
-      energyB += b * b;
-    }
-
-    const normalized = correlation / Math.sqrt(energyA * energyB || 1);
-    if (normalized > bestCorrelation) {
-      bestCorrelation = normalized;
-      bestLag = lag;
-    }
-  }
-
-  if (!bestLag || bestCorrelation < 0.38) return null;
-  return {
-    frequency: sampleRate / bestLag,
-    confidence: bestCorrelation,
-  };
-}
-
-function estimateKeyFromChroma(chroma) {
-  const pitchClasses = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  const majorProfile = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
-  const minorProfile = [6.33, 2.68, 3.52, 5.38, 2.6, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
-  const scores = [];
-
-  for (let root = 0; root < 12; root += 1) {
-    scores.push({ key: pitchClasses[root], score: correlateKeyProfile(chroma, majorProfile, root) });
-    scores.push({ key: `${pitchClasses[root]}m`, score: correlateKeyProfile(chroma, minorProfile, root) });
-  }
-
-  scores.sort((a, b) => b.score - a.score);
-  const best = scores[0];
-  const second = scores[1];
-  const confidence = Math.max(0, Math.min(0.99, (best.score - second.score + 0.15) / 1.15));
-  return {
-    key: best.key,
-    confidence,
-  };
-}
-
-function correlateKeyProfile(chroma, profile, root) {
-  const chromaSum = chroma.reduce((sum, value) => sum + value, 0) || 1;
-  const normalizedChroma = chroma.map((value) => value / chromaSum);
-  const profileSum = profile.reduce((sum, value) => sum + value, 0);
-  const normalizedProfile = profile.map((value) => value / profileSum);
-  let score = 0;
-  for (let index = 0; index < 12; index += 1) {
-    score += normalizedChroma[index] * normalizedProfile[(index - root + 12) % 12];
-  }
-  return score;
-}
-
-async function handleAudioKeyAnalysis(song, file) {
-  if (!file) return;
-  song.analysisStatus = "오디오에서 Key를 추정하는 중입니다.";
-  renderSongs();
-
-  try {
-    const result = await analyzeAudioKey(file);
-    song.key = normalizeKeyName(result.key);
-    song.analysisStatus = `추정 Key: ${song.key} / 신뢰도 ${Math.round(result.confidence * 100)}%. 실제 콘티 Key와 다르면 수정해주세요.`;
-    if (song.title && song.key) rememberSongKey(song.title, song.key);
-    render();
-  } catch {
-    song.analysisStatus = "Key를 추정하지 못했습니다. 더 선명한 오디오 파일을 사용하거나 직접 선택해주세요.";
-    renderSongs();
-  }
-}
-
 async function handleFileList(fileList, songId = "") {
   for (const file of [...fileList]) {
     const item = {
@@ -1217,17 +902,6 @@ function bindEvents() {
     saveSnapshot();
   });
 
-  document.body.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-action='song-recommend']");
-    if (!button) return;
-    const card = button.closest("[data-song-id]");
-    const song = state.songs.find((entry) => entry.id === card?.dataset.songId);
-    if (!song) return;
-    button.disabled = true;
-    handleSongRecommendation(song);
-    button.disabled = false;
-  });
-
   document.body.addEventListener("change", async (event) => {
     const card = event.target.closest("[data-song-id]");
     if (!card) return;
@@ -1246,13 +920,6 @@ function bindEvents() {
       event.target.value = "";
       return;
     }
-
-    if (event.target.dataset.action === "key-audio-upload") {
-      await handleAudioKeyAnalysis(song, event.target.files?.[0]);
-      event.target.value = "";
-      return;
-    }
-
   });
 
 }
