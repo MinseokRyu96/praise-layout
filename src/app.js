@@ -1026,6 +1026,16 @@ function bindEvents() {
     }
   });
 
+  document.body.addEventListener("dblclick", (event) => {
+    const marker = event.target.closest("[data-action='marker-drag']");
+    if (!marker) return;
+    const frame = marker.closest("[data-action='marker-place']");
+    const song = state.songs.find((entry) => entry.id === frame?.dataset.songId);
+    if (!song) return;
+    removeMarker(song, marker.dataset.markerId);
+    event.preventDefault();
+  });
+
   document.body.addEventListener("pointerdown", (event) => {
     const marker = event.target.closest("[data-action='marker-drag']");
     if (!marker) return;
