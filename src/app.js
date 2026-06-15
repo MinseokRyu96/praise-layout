@@ -336,13 +336,12 @@ function renderSongs() {
         <article class="song-card" data-song-id="${song.id}">
           <div class="song-card-body">
             <div class="song-title-row">
-              <span class="song-index">${song.order}</span>
+              <span class="song-number">${song.order}.</span>
               <div class="title-key-grid">
                 <label class="field-block title-field">
                   <input data-field="title" value="${escapeHtml(song.title)}" aria-label="곡명" placeholder="찬양 이름을 입력해주세요" />
                 </label>
                 <label class="field-block key-field">
-                  <span>Key</span>
                   <select data-field="key" aria-label="Key">
                     ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.key === key ? "selected" : ""}>${key || "선택"}</option>`).join("")}
                   </select>
