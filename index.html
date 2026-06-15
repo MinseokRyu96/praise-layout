@@ -24,6 +24,13 @@
     <meta name="twitter:title" content="찬양팀 콘티 제작기 | PraiseLayout" />
     <meta name="twitter:description" content="찬양 콘티, Key, 흐름 메모, 악보 마커를 A3 PDF와 JPG로 정리하는 무료 도구입니다." />
     <meta name="theme-color" content="#0f766e" />
+    <script>
+      (() => {
+        if (new URLSearchParams(window.location.search).get("desktop") === "1") {
+          document.documentElement.classList.add("force-desktop");
+        }
+      })();
+    </script>
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8104838143348148"
@@ -56,7 +63,7 @@
         }
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=41" />
+    <link rel="stylesheet" href="./styles.css?v=42" />
   </head>
   <body>
     <div class="app-shell">

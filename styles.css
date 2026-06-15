@@ -1249,6 +1249,77 @@ textarea {
   }
 }
 
+html.force-desktop,
+html.force-desktop body {
+  max-width: none;
+  overflow-x: auto;
+}
+
+html.force-desktop body,
+html.force-desktop .app-shell {
+  min-width: 1260px;
+}
+
+html.force-desktop .workspace {
+  width: min(1600px, 100%);
+  padding: 26px;
+}
+
+html.force-desktop .topbar,
+html.force-desktop .section-heading {
+  align-items: center;
+  flex-direction: row;
+}
+
+html.force-desktop .top-actions {
+  align-items: center;
+  flex-direction: row;
+}
+
+html.force-desktop h1 {
+  font-size: clamp(28px, 2.4vw, 40px);
+  line-height: 1.08;
+}
+
+html.force-desktop h2 {
+  font-size: 21px;
+}
+
+html.force-desktop .panel,
+html.force-desktop .preview-section {
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+html.force-desktop .split-workbench {
+  grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
+}
+
+html.force-desktop .split-workbench .preview-section {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
+html.force-desktop .site-footer {
+  width: min(1600px, 100%);
+  padding: 0 26px 28px;
+}
+
+html.force-desktop .site-footer-inner {
+  align-items: center;
+  flex-direction: row;
+  gap: 18px;
+  padding-top: 16px;
+}
+
+html.force-desktop .site-footer p,
+html.force-desktop .footer-links a {
+  font-size: 13px;
+}
+
 @media print {
   @page {
     size: A3 landscape;
