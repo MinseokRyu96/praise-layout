@@ -65,7 +65,9 @@ a:focus-visible {
 .app-shell {
   display: flex;
   flex-direction: column;
+  height: 100vh;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 .brand {
@@ -112,8 +114,9 @@ a:focus-visible {
 }
 
 .site-footer {
+  flex: 0 0 auto;
   width: min(1600px, 100%);
-  margin: auto auto 0;
+  margin: 0 auto;
   padding: 0 26px 28px;
 }
 
@@ -136,8 +139,11 @@ a:focus-visible {
 }
 
 .workspace {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   width: min(1600px, 100%);
+  min-height: 0;
   margin: 0 auto;
   padding: 26px;
 }
@@ -151,21 +157,27 @@ a:focus-visible {
 }
 
 .topbar {
+  flex: 0 0 auto;
   margin-bottom: 22px;
 }
 
 .split-workbench {
+  flex: 1 1 auto;
   display: grid;
   grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
   gap: 20px;
   align-items: stretch;
-  height: calc(100vh - 128px);
-  min-height: min(620px, calc(100vh - 128px));
+  min-height: 0;
   overflow: hidden;
+}
+
+.split-workbench > * {
+  min-height: 0;
 }
 
 .editor-column {
   height: 100%;
+  min-height: 0;
   min-width: 0;
   overflow-y: auto;
   padding-right: 4px;
@@ -257,6 +269,7 @@ button:disabled {
   position: sticky;
   top: 20px;
   height: 100%;
+  min-height: 0;
   max-height: none;
   overflow: auto;
   margin-bottom: 0;
@@ -1039,6 +1052,15 @@ textarea {
 }
 
 @media (max-width: 1180px) {
+  .app-shell {
+    height: auto;
+    overflow: visible;
+  }
+
+  .workspace {
+    display: block;
+  }
+
   .split-workbench {
     grid-template-columns: minmax(0, 1fr);
     height: auto;
@@ -1048,6 +1070,7 @@ textarea {
 
   .editor-column {
     height: auto;
+    min-height: 0;
     overflow: visible;
     padding-right: 0;
   }
@@ -1055,6 +1078,7 @@ textarea {
   .split-workbench .preview-section {
     position: static;
     height: auto;
+    min-height: 0;
     max-height: none;
     overflow: visible;
   }
@@ -1270,8 +1294,10 @@ textarea {
 
 html.force-desktop,
 html.force-desktop body {
+  height: 100vh;
   max-width: none;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 html.force-desktop body,
@@ -1279,8 +1305,16 @@ html.force-desktop .app-shell {
   min-width: 1260px;
 }
 
+html.force-desktop .app-shell {
+  height: 100vh;
+  overflow: hidden;
+}
+
 html.force-desktop .workspace {
+  display: flex;
+  flex-direction: column;
   width: min(1600px, 100%);
+  min-height: 0;
   padding: 26px;
 }
 
@@ -1312,15 +1346,16 @@ html.force-desktop .preview-section {
 }
 
 html.force-desktop .split-workbench {
+  flex: 1 1 auto;
   grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
   align-items: stretch;
-  height: calc(100vh - 128px);
-  min-height: min(620px, calc(100vh - 128px));
+  min-height: 0;
   overflow: hidden;
 }
 
 html.force-desktop .editor-column {
   height: 100%;
+  min-height: 0;
   overflow-y: auto;
   padding-right: 4px;
   scrollbar-gutter: stable;
@@ -1330,6 +1365,7 @@ html.force-desktop .split-workbench .preview-section {
   position: sticky;
   top: 20px;
   height: 100%;
+  min-height: 0;
   max-height: none;
   overflow: auto;
   margin-bottom: 0;
