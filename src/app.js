@@ -130,8 +130,16 @@ function getCleanBaseName() {
   return `${title || "콘티"}_${state.setlist.worshipDate || "date"}_A3`;
 }
 
+function getCleanSetlistTitle() {
+  return state.setlist.title.replace(/[^\uac00-\ud7a3a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "") || "찬양팀_콘티";
+}
+
 function getCleanFileName(extension = "pdf") {
   return `${getCleanBaseName()}.${extension}`;
+}
+
+function getPdfFileName() {
+  return `${getCleanSetlistTitle()}.pdf`;
 }
 
 function getPageHeading() {
@@ -444,7 +452,7 @@ function renderPreview() {
   els.warningBox.textContent =
     "현재 설정은 악보가 작게 보일 수 있어요. 코드가 복잡한 곡은 A3 1장에 2곡 배치를 추천합니다.";
 
-  els.fileNameHint.textContent = getCleanFileName();
+  els.fileNameHint.textContent = getPdfFileName();
 }
 
 async function downloadJpgPages() {
@@ -850,6 +858,17 @@ function updatePrintPageRule() {
   style.textContent = `@media print { @page { size: A3 ${state.layout.orientation}; margin: 0; } }`;
 }
 
+function printWithSetlistTitle() {
+  const originalTitle = document.title;
+  document.title = getCleanSetlistTitle();
+  const restoreTitle = () => {
+    document.title = originalTitle;
+    window.removeEventListener("afterprint", restoreTitle);
+  };
+  window.addEventListener("afterprint", restoreTitle);
+  window.print();
+}
+
 function renderSlot(song) {
   const file = getFile(song);
   const hasFlow = state.layout.showMeta && Boolean(song.flow);
@@ -1003,7 +1022,7 @@ function bindEvents() {
   });
   document.querySelector("#printButton").addEventListener("click", () => {
     renderPreview();
-    window.print();
+    printWithSetlistTitle();
   });
   document.querySelector("#jpgButton").addEventListener("click", () => {
     downloadJpgPages();

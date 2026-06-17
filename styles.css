@@ -1394,26 +1394,36 @@ html.force-desktop .footer-links a {
     margin: 0;
   }
 
+  html,
   body {
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
     background: #ffffff;
   }
 
   .site-footer,
   .topbar,
   .panel,
+  .editor-column,
   .preview-section > .section-heading {
     display: none !important;
   }
 
   .app-shell,
   .workspace,
+  .split-workbench,
   .preview-section,
   .preview-canvas {
     display: block;
-    width: auto;
-    margin: 0;
-    padding: 0;
+    height: auto !important;
+    min-height: 0 !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
     border: 0;
+    overflow: visible !important;
     box-shadow: none;
     background: #ffffff;
   }
@@ -1423,9 +1433,15 @@ html.force-desktop .footer-links a {
     height: 297mm;
     max-width: none;
     margin: 0;
-    page-break-after: always;
+    break-after: auto;
+    page-break-after: auto;
     box-shadow: none;
     border: 0;
+  }
+
+  .a3-page:not(:last-child) {
+    break-after: page;
+    page-break-after: always;
   }
 
   .a3-page.portrait {
