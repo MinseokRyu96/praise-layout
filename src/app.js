@@ -24,6 +24,23 @@ const state = {
   files: [],
 };
 
+function notifyVisit() {
+  const host = window.location.hostname;
+  const isLocal = host === "localhost" || host === "127.0.0.1" || host.endsWith(".local") || host.startsWith("192.168.");
+  if (isLocal || sessionStorage.getItem("praise-layout-visit-notified") === "1") return;
+
+  sessionStorage.setItem("praise-layout-visit-notified", "1");
+  fetch("/api/visit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: `${window.location.pathname}${window.location.search}`,
+      title: document.title,
+    }),
+    keepalive: true,
+  }).catch(() => {});
+}
+
 const sampleTitles = [
   "주 은혜임을",
   "시간을 뚫고",
@@ -1160,6 +1177,7 @@ function bindEvents() {
 }
 
 function boot() {
+  notifyVisit();
   loadSnapshot();
   ensureSongCount(state.setlist.songCount);
   bindEvents();
