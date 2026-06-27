@@ -164,7 +164,7 @@ a:focus-visible {
 .split-workbench {
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
+  grid-template-columns: minmax(420px, 38%) minmax(0, 1fr);
   gap: 20px;
   align-items: stretch;
   min-height: 0;
@@ -273,6 +273,14 @@ button:disabled {
   max-height: none;
   overflow: auto;
   margin-bottom: 0;
+}
+
+.split-workbench .a3-page {
+  width: min(100%, calc((100vh - 180px) * 1.414));
+}
+
+.split-workbench .a3-page.portrait {
+  width: min(100%, calc((100vh - 180px) / 1.414));
 }
 
 .intro-panel {
@@ -404,6 +412,10 @@ textarea {
   margin-top: 16px;
 }
 
+.song-list.song-list-count-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .song-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 180px;
@@ -425,7 +437,7 @@ textarea {
 }
 
 .editor-column .title-key-grid {
-  grid-template-columns: minmax(0, 1fr) 62px 62px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .song-title-row {
@@ -437,9 +449,17 @@ textarea {
 
 .title-key-grid {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) 76px 76px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   flex: 1 1 auto;
+  min-width: 0;
+}
+
+.key-select-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(72px, 92px));
+  gap: 8px;
+  justify-content: start;
   min-width: 0;
 }
 
@@ -608,7 +628,7 @@ textarea {
   }
 
   .title-key-grid {
-    grid-template-columns: minmax(0, 1fr) 72px 72px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .upload-panel {
@@ -1251,7 +1271,11 @@ textarea {
   }
 
   .title-key-grid {
-    grid-template-columns: minmax(0, 1fr) 64px 64px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .key-select-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .setlist-form,
@@ -1441,7 +1465,7 @@ html.force-desktop .preview-section {
 
 html.force-desktop .split-workbench {
   flex: 1 1 auto;
-  grid-template-columns: minmax(340px, 34%) minmax(0, 1fr);
+  grid-template-columns: minmax(420px, 38%) minmax(0, 1fr);
   align-items: stretch;
   min-height: 0;
   overflow: hidden;
@@ -1463,6 +1487,14 @@ html.force-desktop .split-workbench .preview-section {
   max-height: none;
   overflow: auto;
   margin-bottom: 0;
+}
+
+html.force-desktop .split-workbench .a3-page {
+  width: min(100%, calc((100vh - 180px) * 1.414));
+}
+
+html.force-desktop .split-workbench .a3-page.portrait {
+  width: min(100%, calc((100vh - 180px) / 1.414));
 }
 
 html.force-desktop .site-footer {

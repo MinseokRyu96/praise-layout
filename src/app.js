@@ -381,6 +381,7 @@ function syncControls() {
 }
 
 function renderSongs() {
+  els.songList.className = `song-list song-list-count-${state.songs.length}`;
   els.songList.innerHTML = state.songs
     .map((song) => {
       const file = getFile(song);
@@ -393,16 +394,18 @@ function renderSongs() {
                 <label class="field-block title-field">
                   <input data-field="title" value="${escapeHtml(song.title)}" aria-label="곡명" placeholder="찬양 이름을 입력해주세요" />
                 </label>
-                <label class="field-block key-field">
-                  <select data-field="key" aria-label="Key">
-                    ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.key === key ? "selected" : ""}>${key || "선택"}</option>`).join("")}
-                  </select>
-                </label>
-                <label class="field-block key-field modulation-key-field">
-                  <select data-field="modulationKey" aria-label="전조 Key">
-                    ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.modulationKey === key ? "selected" : ""}>${key || "전조"}</option>`).join("")}
-                  </select>
-                </label>
+                <div class="key-select-row">
+                  <label class="field-block key-field">
+                    <select data-field="key" aria-label="Key">
+                      ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.key === key ? "selected" : ""}>${key || "Key"}</option>`).join("")}
+                    </select>
+                  </label>
+                  <label class="field-block key-field modulation-key-field">
+                    <select data-field="modulationKey" aria-label="전조 Key">
+                      ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.modulationKey === key ? "selected" : ""}>${key || "전조"}</option>`).join("")}
+                    </select>
+                  </label>
+                </div>
               </div>
             </div>
             <label class="field-block flow-field">
