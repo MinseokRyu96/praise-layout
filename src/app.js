@@ -142,6 +142,12 @@ function ensureSongCount(count) {
   }));
 }
 
+function applySingleSongLayout() {
+  if (state.setlist.songCount !== 1) return;
+  state.layout.songsPerPage = 1;
+  state.layout.orientation = "portrait";
+}
+
 function getFile(song) {
   return state.files.find((file) => file.id === song.fileId);
 }
@@ -1037,6 +1043,7 @@ function bindEvents() {
   els.songCount.addEventListener("change", (event) => {
     state.setlist.songCount = Number(event.target.value);
     ensureSongCount(state.setlist.songCount);
+    applySingleSongLayout();
     render();
   });
 
@@ -1049,6 +1056,7 @@ function bindEvents() {
 
   els.songsPerPage.addEventListener("change", (event) => {
     state.layout.songsPerPage = Number(event.target.value);
+    if (state.layout.songsPerPage === 1) state.layout.orientation = "portrait";
     render();
   });
 
@@ -1262,6 +1270,7 @@ function boot() {
   notifyVisit();
   loadSnapshot();
   ensureSongCount(state.setlist.songCount);
+  applySingleSongLayout();
   bindEvents();
   render();
   restoreStoredFileObjectUrls()
