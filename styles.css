@@ -1481,12 +1481,17 @@ textarea {
 
   .a3-page {
     width: 100%;
+    aspect-ratio: auto;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
     gap: 6px;
-    padding: 10px;
+    padding: 0;
   }
 
   .a3-page.portrait {
-    width: min(100%, 320px);
+    width: 100%;
+    aspect-ratio: auto;
   }
 
   .preview-canvas {
@@ -1495,7 +1500,58 @@ textarea {
   }
 
   .a3-page-heading {
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #ffffff;
     font-size: 11px;
+    white-space: normal;
+  }
+
+  .a3-page-body,
+  .layout-1,
+  .layout-2.landscape,
+  .layout-2.portrait,
+  .layout-3.landscape,
+  .layout-3.portrait,
+  .layout-4 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    gap: 14px;
+  }
+
+  .sheet-slot {
+    height: auto;
+    min-height: min(112vw, 460px);
+    overflow: visible;
+    border-radius: 10px;
+    box-shadow: 0 10px 22px rgba(18, 25, 38, 0.08);
+  }
+
+  .sheet-slot.has-flow {
+    --flow-max-height: none;
+  }
+
+  .slot-body {
+    flex: 0 0 auto;
+    min-height: min(92vw, 390px);
+  }
+
+  .sheet-slot.has-flow .slot-body {
+    min-height: min(78vw, 330px);
+  }
+
+  .sheet-frame {
+    min-height: inherit;
+  }
+
+  .slot-flow {
+    max-height: none;
+    overflow: visible;
+    font-size: 16px;
+    line-height: 1.35;
   }
 
   .site-header {
