@@ -51,40 +51,42 @@ const legacyDefaultSetlistTitle = "주일 2부 예배 찬양 콘티";
 const keyOptions = [
   "",
   "C",
-  "C#",
   "Db",
   "D",
-  "D#",
   "Eb",
   "E",
   "F",
-  "F#",
   "Gb",
   "G",
-  "G#",
   "Ab",
   "A",
-  "A#",
   "Bb",
   "B",
   "Cm",
-  "C#m",
   "Dbm",
   "Dm",
-  "D#m",
   "Ebm",
   "Em",
   "Fm",
-  "F#m",
   "Gbm",
   "Gm",
-  "G#m",
   "Abm",
   "Am",
-  "A#m",
   "Bbm",
   "Bm",
 ];
+const flatKeyAliases = {
+  "C#": "Db",
+  "D#": "Eb",
+  "F#": "Gb",
+  "G#": "Ab",
+  "A#": "Bb",
+  "C#m": "Dbm",
+  "D#m": "Ebm",
+  "F#m": "Gbm",
+  "G#m": "Abm",
+  "A#m": "Bbm",
+};
 const markerOptions = ["V", "Ch", "P.C", "Br"];
 let draggingMarker = {
   songId: "",
@@ -132,6 +134,10 @@ function createSong(index) {
   };
 }
 
+function normalizeKeyName(key) {
+  return flatKeyAliases[key] || key || "";
+}
+
 function ensureSongCount(count) {
   while (state.songs.length < count) {
     state.songs.push(createSong(state.songs.length));
@@ -139,6 +145,8 @@ function ensureSongCount(count) {
   state.songs = state.songs.slice(0, count).map((song, index) => ({
     ...createSong(index),
     ...song,
+    key: normalizeKeyName(song.key),
+    modulationKey: normalizeKeyName(song.modulationKey),
     order: index + 1,
   }));
 }
@@ -176,7 +184,9 @@ function getPageHeading() {
 
 function getSongLabel(song) {
   const title = song.title || "곡명 없음";
-  const keyLabel = song.key && song.modulationKey && song.key !== song.modulationKey ? `${song.key} → ${song.modulationKey}` : song.key;
+  const key = normalizeKeyName(song.key);
+  const modulationKey = normalizeKeyName(song.modulationKey);
+  const keyLabel = key && modulationKey && key !== modulationKey ? `${key} → ${modulationKey}` : key;
   return keyLabel ? `${song.order}. ${title} [${keyLabel}]` : `${song.order}. ${title}`;
 }
 
@@ -340,8 +350,8 @@ function rememberSongKey(title, key, modulationKey = "") {
   const memory = getSongKeyMemory();
   memory[normalizedTitle] = {
     title: title.trim(),
-    key,
-    modulationKey,
+    key: normalizeKeyName(key),
+    modulationKey: normalizeKeyName(modulationKey),
     updatedAt: Date.now(),
   };
   localStorage.setItem(songKeyStorageKey, JSON.stringify(memory));
@@ -350,13 +360,13 @@ function rememberSongKey(title, key, modulationKey = "") {
 function findRememberedKey(title) {
   const normalizedTitle = normalizeSongTitle(title);
   if (!normalizedTitle) return "";
-  return getSongKeyMemory()[normalizedTitle]?.key || "";
+  return normalizeKeyName(getSongKeyMemory()[normalizedTitle]?.key);
 }
 
 function findRememberedModulationKey(title) {
   const normalizedTitle = normalizeSongTitle(title);
   if (!normalizedTitle) return "";
-  return getSongKeyMemory()[normalizedTitle]?.modulationKey || "";
+  return normalizeKeyName(getSongKeyMemory()[normalizedTitle]?.modulationKey);
 }
 
 function migratePlaceholderDefaults() {
@@ -1245,6 +1255,9 @@ function bindEvents() {
     const song = state.songs.find((entry) => entry.id === card.dataset.songId);
     if (!song) return;
     song[event.target.dataset.field] = event.target.value;
+    if (event.target.dataset.field === "key" || event.target.dataset.field === "modulationKey") {
+      song[event.target.dataset.field] = normalizeKeyName(song[event.target.dataset.field]);
+    }
     let shouldRenderSongs = false;
     if (event.target.dataset.field === "title" && !song.key) {
       const rememberedKey = findRememberedKey(song.title);
@@ -1270,6 +1283,9 @@ function bindEvents() {
 
     if (event.target.dataset.field) {
       song[event.target.dataset.field] = event.target.value;
+      if (event.target.dataset.field === "key" || event.target.dataset.field === "modulationKey") {
+        song[event.target.dataset.field] = normalizeKeyName(song[event.target.dataset.field]);
+      }
       if (song.title && song.key) rememberSongKey(song.title, song.key, song.modulationKey);
       render();
       return;
