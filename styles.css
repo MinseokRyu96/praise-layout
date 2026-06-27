@@ -524,6 +524,13 @@ textarea {
   gap: 6px;
 }
 
+.slot-marker-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .marker-tool {
   min-height: 34px;
   padding: 7px 8px;
@@ -533,6 +540,20 @@ textarea {
   color: var(--ink);
   font-size: 12px;
   font-weight: 900;
+}
+
+.slot-marker-toolbar .marker-tool {
+  min-width: 28px;
+  min-height: 24px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.slot-marker-toolbar .marker-clear {
+  min-width: 36px;
+  color: #7c2d12;
 }
 
 .marker-tool.active {
@@ -792,6 +813,19 @@ textarea {
   font-weight: 900;
 }
 
+.slot-meta strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slot-marker-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .slot-body {
   position: relative;
   flex: 1 1 auto;
@@ -820,14 +854,14 @@ textarea {
 .sheet-marker {
   position: absolute;
   z-index: 3;
-  min-width: 26px;
-  min-height: 24px;
-  padding: 3px 7px;
+  min-width: calc(26px * var(--marker-size, 1));
+  min-height: calc(24px * var(--marker-size, 1));
+  padding: calc(3px * var(--marker-size, 1)) calc(7px * var(--marker-size, 1));
   border: 1.5px solid #111827;
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.94);
   color: #111827;
-  font-size: 13px;
+  font-size: calc(13px * var(--marker-size, 1));
   font-weight: 950;
   line-height: 1;
   transform: translate(-50%, -50%);
@@ -837,9 +871,69 @@ textarea {
   box-shadow: 0 2px 5px rgba(17, 24, 39, 0.18);
 }
 
-.sheet-marker.dragging {
+.sheet-marker.dragging,
+.sheet-marker.resizing {
   cursor: grabbing;
   box-shadow: 0 5px 12px rgba(17, 24, 39, 0.24);
+}
+
+.sheet-marker-label {
+  display: block;
+  pointer-events: none;
+}
+
+.sheet-marker-delete {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #111827;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.85);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+.sheet-marker:hover .sheet-marker-delete,
+.sheet-marker:focus-within .sheet-marker-delete {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.sheet-marker-resize {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #111827;
+  border-radius: 999px;
+  background: #ffffff;
+  cursor: nwse-resize;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.sheet-marker:hover .sheet-marker-resize,
+.sheet-marker:focus-within .sheet-marker-resize,
+.sheet-marker.resizing .sheet-marker-resize {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sheet-frame img {
@@ -1407,7 +1501,14 @@ html.force-desktop .footer-links a {
   .topbar,
   .panel,
   .editor-column,
+  .slot-marker-toolbar,
+  .sheet-marker-delete,
+  .sheet-marker-resize,
   .preview-section > .section-heading {
+    display: none !important;
+  }
+
+  .slot-meta.marker-only {
     display: none !important;
   }
 
