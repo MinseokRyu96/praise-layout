@@ -2,6 +2,7 @@ const storageKey = "praise-layout-mvp-v10";
 const songKeyStorageKey = "praise-layout-song-key-memory-v1";
 const fileDbName = "praise-layout-files";
 const fileStoreName = "files";
+const canvasFontFamily = '"Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", sans-serif';
 
 const today = new Date();
 const defaultDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7)
@@ -515,6 +516,7 @@ function renderPreview() {
 
 async function downloadJpgPages() {
   renderPreview();
+  await document.fonts?.ready?.catch(() => {});
 
   const button = document.querySelector("#jpgButton");
   const originalContent = button.innerHTML;
@@ -578,7 +580,7 @@ function getCanvasMargin(scale) {
 function drawJpgPageHeading(ctx, width, margin, height, scale) {
   ctx.save();
   ctx.fillStyle = "#182230";
-  ctx.font = `900 ${12 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.font = `900 ${12 * scale}px ${canvasFontFamily}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(getPageHeading(), width / 2, margin + height / 2, width - margin * 2);
@@ -642,7 +644,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.lineTo(rect.x + rect.width, rect.y + metaHeight);
     ctx.stroke();
     ctx.fillStyle = "#182230";
-    ctx.font = `900 ${13 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = `900 ${13 * scale}px ${canvasFontFamily}`;
     ctx.textBaseline = "middle";
     drawClampedLine(ctx, getSongLabel(song), rect.x + 9 * scale, rect.y + metaHeight / 2, rect.width - 18 * scale);
     contentY += metaHeight;
@@ -653,7 +655,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
   let flowHeight = 0;
   if (hasFlow) {
     const flowPadding = 10 * scale;
-    ctx.font = `800 ${20 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = `800 ${20 * scale}px ${canvasFontFamily}`;
     const lineHeight = 26 * scale;
     const flowLines = getWrappedLines(ctx, song.flow, rect.width - flowPadding * 2, 4);
     flowHeight = Math.min(rect.height * 0.48, flowLines.length * lineHeight + flowPadding * 2);
@@ -680,7 +682,7 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.lineTo(rect.x + rect.width, flowY);
     ctx.stroke();
     ctx.fillStyle = "#111827";
-    ctx.font = `800 ${20 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = `800 ${20 * scale}px ${canvasFontFamily}`;
     ctx.textBaseline = "top";
     drawWrappedText(ctx, song.flow, rect.x + 10 * scale, flowY + 8 * scale, rect.width - 20 * scale, 26 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (26 * scale))));
   }
@@ -718,7 +720,7 @@ function drawSheetMarkers(ctx, song, frame, scale) {
     if (!label) return;
 
     ctx.save();
-    ctx.font = `900 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.font = `900 ${fontSize}px ${canvasFontFamily}`;
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     const textWidth = ctx.measureText(label).width;
@@ -795,7 +797,7 @@ function drawCenteredPlaceholder(ctx, text, frame, color, scale) {
   const lines = text.split("\n");
   const lineHeight = 18 * scale;
   ctx.fillStyle = color;
-  ctx.font = `900 ${13 * scale}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.font = `900 ${13 * scale}px ${canvasFontFamily}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   lines.forEach((line, index) => {
