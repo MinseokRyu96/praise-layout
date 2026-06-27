@@ -1269,6 +1269,11 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   body {
     background: var(--wash);
   }
@@ -1280,16 +1285,16 @@ textarea {
 
   .workspace {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
   }
 
   .topbar {
-    gap: 14px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
   h1 {
-    font-size: 27px;
+    font-size: 24px;
     line-height: 1.12;
   }
 
@@ -1299,23 +1304,47 @@ textarea {
 
   .panel,
   .preview-section {
-    margin-bottom: 14px;
-    padding: 14px;
+    margin-bottom: 12px;
+    padding: 12px;
     border-radius: 10px;
   }
 
   .topbar,
-  .section-heading,
-  .top-actions {
+  .section-heading {
     align-items: stretch;
     flex-direction: column;
   }
 
+  .top-actions {
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .top-actions button {
+    min-height: 44px;
+    padding: 10px 8px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
   .setlist-form,
   .settings-grid,
-  .layout-quick-settings,
   .song-card-body {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .setlist-form {
+    grid-template-columns: minmax(0, 1fr) 86px;
+  }
+
+  .setlist-form label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .layout-quick-settings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .title-key-grid {
@@ -1363,8 +1392,21 @@ textarea {
   }
 
   .layout-quick-settings label {
-    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 5px;
+    min-height: 72px;
     min-width: 0;
+    white-space: normal;
+  }
+
+  .layout-quick-settings select,
+  .layout-quick-settings .checkbox-row {
+    min-height: 36px;
+  }
+
+  .layout-quick-settings .checkbox-row {
+    justify-content: flex-start;
   }
 
   .song-card {
@@ -1374,20 +1416,82 @@ textarea {
   }
 
   .song-title-row {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: start;
     gap: 7px;
   }
 
   .song-number {
-    line-height: 44px;
+    line-height: 48px;
+    text-align: right;
   }
 
   .flow-field textarea {
-    min-height: 96px;
+    min-height: 92px;
+  }
+
+  .upload-panel {
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .sheet-preview-mini {
+    min-height: 90px;
+    border-radius: 10px;
+  }
+
+  .sheet-preview-mini img {
+    height: 82px;
+  }
+
+  .sheet-upload-delete {
+    width: 32px;
+    height: 32px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .file-drop {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .slot-meta {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .slot-marker-toolbar {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    gap: 5px;
+  }
+
+  .slot-marker-toolbar .marker-tool {
+    min-width: 0;
+    min-height: 32px;
+    font-size: 11px;
+  }
+
+  .slot-marker-toolbar .marker-clear {
+    min-width: 0;
   }
 
   .a3-page {
+    width: 100%;
     gap: 6px;
     padding: 10px;
+  }
+
+  .a3-page.portrait {
+    width: min(100%, 320px);
+  }
+
+  .preview-canvas {
+    gap: 14px;
+    margin-top: 12px;
   }
 
   .a3-page-heading {
