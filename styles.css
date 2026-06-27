@@ -926,6 +926,9 @@ textarea {
 .sheet-marker {
   position: absolute;
   z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: calc(26px * var(--marker-size, 1));
   min-height: calc(24px * var(--marker-size, 1));
   padding: calc(3px * var(--marker-size, 1)) calc(7px * var(--marker-size, 1));
@@ -936,7 +939,10 @@ textarea {
   font-size: calc(13px * var(--marker-size, 1));
   font-weight: 950;
   line-height: 1;
+  text-align: center;
+  white-space: nowrap;
   transform: translate(-50%, -50%);
+  transform-origin: center;
   pointer-events: auto;
   cursor: grab;
   touch-action: none;
@@ -1269,6 +1275,193 @@ textarea {
   .settings-grid,
   .layout-quick-settings {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1180px) {
+  .workspace {
+    width: 100%;
+    padding: 18px;
+  }
+
+  .topbar {
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+
+  .panel,
+  .preview-section {
+    margin-bottom: 16px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .setlist-form {
+    grid-template-columns: minmax(0, 1fr) 116px;
+  }
+
+  .setlist-form label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .layout-quick-settings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .layout-quick-settings label {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .song-list {
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .song-card {
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .song-title-row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+  }
+
+  .song-number {
+    line-height: 48px;
+    text-align: right;
+  }
+
+  .key-select-row {
+    grid-template-columns: repeat(2, minmax(0, 92px));
+  }
+
+  .flow-field textarea {
+    min-height: 104px;
+  }
+
+  .upload-panel {
+    grid-template-columns: 108px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .sheet-preview-mini {
+    min-height: 96px;
+  }
+
+  .sheet-preview-mini img {
+    height: 88px;
+  }
+
+  .slot-marker-toolbar {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    gap: 5px;
+  }
+
+  .slot-marker-toolbar .marker-tool,
+  .slot-marker-toolbar .marker-clear {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 820px) and (max-width: 1180px) {
+  html,
+  body {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-shell {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .workspace {
+    display: flex;
+    min-height: 0;
+  }
+
+  .split-workbench {
+    grid-template-columns: minmax(320px, 42%) minmax(0, 1fr);
+    gap: 16px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .editor-column {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 2px;
+    scrollbar-gutter: stable;
+  }
+
+  .split-workbench .preview-section {
+    position: sticky;
+    top: 18px;
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
+    margin-bottom: 0;
+  }
+
+  .split-workbench .preview-canvas {
+    gap: 16px;
+    margin-top: 14px;
+  }
+
+  .split-workbench .a3-page {
+    width: min(100%, calc((100vh - 166px) * 1.414));
+  }
+
+  .split-workbench .a3-page.portrait {
+    width: min(100%, calc((100vh - 166px) / 1.414));
+  }
+
+  .site-footer {
+    display: none;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 819px) {
+  .topbar,
+  .section-heading {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .top-actions {
+    flex: 1 1 100%;
+  }
+
+  .top-actions button {
+    min-height: 44px;
+  }
+
+  .preview-canvas {
+    gap: 18px;
+  }
+
+  .a3-page {
+    width: min(100%, 900px);
   }
 }
 
