@@ -254,6 +254,10 @@ button:disabled {
   background: #ffffff;
 }
 
+.mobile-label {
+  display: none;
+}
+
 .panel,
 .preview-section {
   margin-bottom: 20px;
@@ -582,7 +586,7 @@ textarea {
 }
 
 .slot-marker-toolbar .marker-clear {
-  min-width: 36px;
+  min-width: 54px;
   color: #7c2d12;
 }
 
@@ -1329,6 +1333,14 @@ textarea {
     line-height: 1.2;
   }
 
+  .desktop-label {
+    display: none;
+  }
+
+  .mobile-label {
+    display: inline;
+  }
+
   .setlist-form,
   .settings-grid,
   .song-card-body {
@@ -1651,8 +1663,17 @@ html.force-desktop .section-heading {
 }
 
 html.force-desktop .top-actions {
+  display: flex;
   align-items: center;
   flex-direction: row;
+}
+
+html.force-desktop .desktop-label {
+  display: inline;
+}
+
+html.force-desktop .mobile-label {
+  display: none;
 }
 
 html.force-desktop h1 {

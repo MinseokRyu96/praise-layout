@@ -63,7 +63,7 @@
         }
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=52" />
+    <link rel="stylesheet" href="./styles.css?v=53" />
   </head>
   <body>
     <div class="app-shell">
@@ -74,8 +74,14 @@
           </div>
           <div class="top-actions">
             <button id="saveButton" class="ghost-button" type="button">저장</button>
-            <button id="jpgButton" class="secondary-button" type="button">JPG 다운로드</button>
-            <button id="printButton" class="primary-button" type="button">PDF 다운로드</button>
+            <button id="jpgButton" class="secondary-button" type="button">
+              <span class="desktop-label">JPG 다운로드</span>
+              <span class="mobile-label">JPG</span>
+            </button>
+            <button id="printButton" class="primary-button" type="button">
+              <span class="desktop-label">PDF 다운로드</span>
+              <span class="mobile-label">PDF</span>
+            </button>
           </div>
         </header>
 
@@ -133,7 +139,7 @@
                     표시
                     <span class="checkbox-row">
                       <input id="showMeta" type="checkbox" checked />
-                      제목/흐름
+                      제목/흐름 표시
                     </span>
                   </label>
                 </div>
@@ -143,8 +149,8 @@
             <section id="songs" class="panel">
               <div class="section-heading">
                 <div>
-                  <p class="eyebrow">Step 1</p>
-                  <h2>곡 정보 입력</h2>
+                  <p class="eyebrow">콘티 작성</p>
+                  <h2>곡 정보</h2>
                 </div>
               </div>
               <div id="songList" class="song-list"></div>
@@ -154,8 +160,8 @@
           <section id="preview" class="preview-section">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">Step 2</p>
-                <h2>출력 미리보기</h2>
+                <p class="eyebrow">악보 확인</p>
+                <h2>미리보기</h2>
               </div>
               <span id="fileNameHint" class="file-name-hint"></span>
             </div>
@@ -180,6 +186,6 @@
       </footer>
     </div>
 
-    <script src="./src/app.js?v=54"></script>
+    <script src="./src/app.js?v=55"></script>
   </body>
 </html>

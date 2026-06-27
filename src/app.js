@@ -460,7 +460,7 @@ function renderMarkerControls(song) {
             `<button data-action="marker-select" data-label="${escapeHtml(label)}" class="marker-tool" type="button">${escapeHtml(label)}</button>`,
         )
         .join("")}
-      <button data-action="markers-clear" class="marker-tool marker-clear" type="button">삭제</button>
+      <button data-action="markers-clear" class="marker-tool marker-clear" type="button">마커삭제</button>
     </div>
   `;
 }
@@ -517,7 +517,7 @@ async function downloadJpgPages() {
   renderPreview();
 
   const button = document.querySelector("#jpgButton");
-  const originalText = button.textContent;
+  const originalContent = button.innerHTML;
   button.disabled = true;
   button.textContent = "JPG 생성 중";
 
@@ -538,7 +538,7 @@ async function downloadJpgPages() {
     alert("JPG 파일을 만드는 중 문제가 발생했습니다. 악보 이미지를 다시 업로드한 뒤 시도해 주세요.");
   } finally {
     button.disabled = false;
-    button.textContent = originalText;
+    button.innerHTML = originalContent;
   }
 }
 
