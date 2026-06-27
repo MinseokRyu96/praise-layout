@@ -425,7 +425,7 @@ textarea {
 }
 
 .editor-column .title-key-grid {
-  grid-template-columns: minmax(0, 1fr) 66px;
+  grid-template-columns: minmax(0, 1fr) 62px 62px;
 }
 
 .song-title-row {
@@ -437,7 +437,7 @@ textarea {
 
 .title-key-grid {
   display: grid;
-  grid-template-columns: minmax(170px, 1fr) 76px;
+  grid-template-columns: minmax(140px, 1fr) 76px 76px;
   gap: 8px;
   flex: 1 1 auto;
   min-width: 0;
@@ -608,7 +608,7 @@ textarea {
   }
 
   .title-key-grid {
-    grid-template-columns: minmax(0, 1fr) 76px;
+    grid-template-columns: minmax(0, 1fr) 72px 72px;
   }
 
   .upload-panel {
@@ -1251,7 +1251,7 @@ textarea {
   }
 
   .title-key-grid {
-    grid-template-columns: minmax(0, 1fr) 72px;
+    grid-template-columns: minmax(0, 1fr) 64px 64px;
   }
 
   .setlist-form,

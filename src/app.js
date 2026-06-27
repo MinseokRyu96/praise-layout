@@ -125,6 +125,7 @@ function createSong(index) {
     order: index + 1,
     title: "",
     key: "",
+    modulationKey: "",
     flow: "",
     markers: [],
     fileId: "",
@@ -175,7 +176,8 @@ function getPageHeading() {
 
 function getSongLabel(song) {
   const title = song.title || "곡명 없음";
-  return song.key ? `${song.order}. ${title} [${song.key}]` : `${song.order}. ${title}`;
+  const keyLabel = song.key && song.modulationKey && song.key !== song.modulationKey ? `${song.key} → ${song.modulationKey}` : song.key;
+  return keyLabel ? `${song.order}. ${title} [${keyLabel}]` : `${song.order}. ${title}`;
 }
 
 function getSongPages() {
@@ -332,13 +334,14 @@ function getSongKeyMemory() {
   }
 }
 
-function rememberSongKey(title, key) {
+function rememberSongKey(title, key, modulationKey = "") {
   const normalizedTitle = normalizeSongTitle(title);
   if (!normalizedTitle || !key) return;
   const memory = getSongKeyMemory();
   memory[normalizedTitle] = {
     title: title.trim(),
     key,
+    modulationKey,
     updatedAt: Date.now(),
   };
   localStorage.setItem(songKeyStorageKey, JSON.stringify(memory));
@@ -348,6 +351,12 @@ function findRememberedKey(title) {
   const normalizedTitle = normalizeSongTitle(title);
   if (!normalizedTitle) return "";
   return getSongKeyMemory()[normalizedTitle]?.key || "";
+}
+
+function findRememberedModulationKey(title) {
+  const normalizedTitle = normalizeSongTitle(title);
+  if (!normalizedTitle) return "";
+  return getSongKeyMemory()[normalizedTitle]?.modulationKey || "";
 }
 
 function migratePlaceholderDefaults() {
@@ -387,6 +396,11 @@ function renderSongs() {
                 <label class="field-block key-field">
                   <select data-field="key" aria-label="Key">
                     ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.key === key ? "selected" : ""}>${key || "선택"}</option>`).join("")}
+                  </select>
+                </label>
+                <label class="field-block key-field modulation-key-field">
+                  <select data-field="modulationKey" aria-label="전조 Key">
+                    ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.modulationKey === key ? "selected" : ""}>${key || "전조"}</option>`).join("")}
                   </select>
                 </label>
               </div>
@@ -1233,11 +1247,12 @@ function bindEvents() {
       const rememberedKey = findRememberedKey(song.title);
       if (rememberedKey) {
         song.key = rememberedKey;
+        song.modulationKey = findRememberedModulationKey(song.title);
         shouldRenderSongs = true;
       }
     }
-    if ((event.target.dataset.field === "title" || event.target.dataset.field === "key") && song.title && song.key) {
-      rememberSongKey(song.title, song.key);
+    if ((event.target.dataset.field === "title" || event.target.dataset.field === "key" || event.target.dataset.field === "modulationKey") && song.title && song.key) {
+      rememberSongKey(song.title, song.key, song.modulationKey);
     }
     if (shouldRenderSongs) renderSongs();
     renderPreview();
@@ -1252,7 +1267,7 @@ function bindEvents() {
 
     if (event.target.dataset.field) {
       song[event.target.dataset.field] = event.target.value;
-      if (song.title && song.key) rememberSongKey(song.title, song.key);
+      if (song.title && song.key) rememberSongKey(song.title, song.key, song.modulationKey);
       render();
       return;
     }
