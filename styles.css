@@ -598,6 +598,7 @@ textarea {
 }
 
 .sheet-preview-mini {
+  position: relative;
   display: grid;
   min-height: 132px;
   place-items: center;
@@ -610,6 +611,40 @@ textarea {
   text-align: center;
   padding: 6px;
   line-height: 1.4;
+}
+
+.sheet-upload-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid rgba(124, 45, 18, 0.16);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: #7c2d12;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 8px 18px rgba(18, 25, 38, 0.12);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.sheet-preview-mini:hover .sheet-upload-delete,
+.sheet-preview-mini:focus-within .sheet-upload-delete {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sheet-upload-delete:hover {
+  transform: scale(1.04);
+  background: #fff7ed;
 }
 
 @media (min-width: 1500px) {

@@ -416,6 +416,7 @@ function renderSongs() {
                 ? `<div class="upload-panel">
                     <div class="sheet-preview-mini">
                       ${renderFilePreview(file)}
+                      <button class="sheet-upload-delete" data-action="sheet-upload-delete" type="button" aria-label="${escapeHtml(file.name)} 악보 삭제">×</button>
                     </div>
                     <p class="match-copy">${escapeHtml(file.name)}</p>
                   </div>`
@@ -1094,6 +1095,19 @@ function bindEvents() {
   });
 
   document.body.addEventListener("click", (event) => {
+    const uploadDeleteButton = event.target.closest("[data-action='sheet-upload-delete']");
+    if (uploadDeleteButton) {
+      const card = uploadDeleteButton.closest("[data-song-id]");
+      const song = state.songs.find((entry) => entry.id === card?.dataset.songId);
+      if (!song || !song.fileId) return;
+      removeFile(song.fileId);
+      song.fileId = "";
+      event.preventDefault();
+      event.stopPropagation();
+      render();
+      return;
+    }
+
     const deleteButton = event.target.closest("[data-action='marker-delete']");
     if (deleteButton) {
       const frame = deleteButton.closest("[data-action='marker-place']");
