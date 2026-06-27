@@ -85,7 +85,7 @@ const keyOptions = [
   "Bbm",
   "Bm",
 ];
-const markerOptions = ["V", "Ch", "P.C", "Br"];
+const markerOptions = ["V", "Ch", "P.C", "Br", "Key↑"];
 let draggingMarker = {
   songId: "",
   markerId: "",
