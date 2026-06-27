@@ -62,18 +62,6 @@ const keyOptions = [
   "A",
   "Bb",
   "B",
-  "Cm",
-  "Dbm",
-  "Dm",
-  "Ebm",
-  "Em",
-  "Fm",
-  "Gbm",
-  "Gm",
-  "Abm",
-  "Am",
-  "Bbm",
-  "Bm",
 ];
 const flatKeyAliases = {
   "C#": "Db",
@@ -81,11 +69,11 @@ const flatKeyAliases = {
   "F#": "Gb",
   "G#": "Ab",
   "A#": "Bb",
-  "C#m": "Dbm",
-  "D#m": "Ebm",
-  "F#m": "Gbm",
-  "G#m": "Abm",
-  "A#m": "Bbm",
+  "C#m": "Db",
+  "D#m": "Eb",
+  "F#m": "Gb",
+  "G#m": "Ab",
+  "A#m": "Bb",
 };
 const markerOptions = ["V", "Ch", "P.C", "Br"];
 let draggingMarker = {
@@ -135,7 +123,8 @@ function createSong(index) {
 }
 
 function normalizeKeyName(key) {
-  return flatKeyAliases[key] || key || "";
+  const normalizedKey = flatKeyAliases[key] || key || "";
+  return normalizedKey.endsWith("m") ? normalizedKey.slice(0, -1) : normalizedKey;
 }
 
 function ensureSongCount(count) {
@@ -412,7 +401,7 @@ function renderSongs() {
                   </label>
                   <label class="field-block key-field modulation-key-field">
                     <select data-field="modulationKey" aria-label="전조 Key">
-                      ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.modulationKey === key ? "selected" : ""}>${key || "전조"}</option>`).join("")}
+                      ${keyOptions.map((key) => `<option value="${escapeHtml(key)}" ${song.modulationKey === key ? "selected" : ""}>${key || "전조없음"}</option>`).join("")}
                     </select>
                   </label>
                 </div>
