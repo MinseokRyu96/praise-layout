@@ -1989,10 +1989,48 @@ html.force-desktop .footer-links a {
     height: 297mm;
     max-width: none;
     margin: 0;
+    padding: 0 !important;
+    gap: 0 !important;
     break-after: auto;
     page-break-after: auto;
     box-shadow: none;
     border: 0;
+  }
+
+  .a3-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 8mm;
+    padding: 0 4mm;
+    font-size: 11pt;
+    line-height: 1.1;
+  }
+
+  .a3-page-body {
+    height: calc(100% - 8mm);
+    gap: 0 !important;
+  }
+
+  .sheet-slot {
+    border-width: 0.25mm;
+  }
+
+  .slot-meta {
+    min-height: 7mm;
+    padding: 1mm 2mm;
+  }
+
+  .slot-body {
+    padding: 0;
+  }
+
+  .slot-flow {
+    padding: 2mm 3mm;
+  }
+
+  .sheet-frame .fallback-sheet {
+    inset: 0;
   }
 
   .a3-page:not(:last-child) {
