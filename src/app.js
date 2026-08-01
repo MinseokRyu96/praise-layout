@@ -655,8 +655,8 @@ async function drawJpgSlot(ctx, song, rect, scale) {
   let flowHeight = 0;
   if (hasFlow) {
     const flowPadding = 10 * scale;
-    ctx.font = `800 ${20 * scale}px ${canvasFontFamily}`;
-    const lineHeight = 26 * scale;
+    ctx.font = `800 ${18 * scale}px ${canvasFontFamily}`;
+    const lineHeight = 23 * scale;
     const flowLines = getWrappedLines(ctx, song.flow, rect.width - flowPadding * 2, 4);
     flowHeight = Math.min(rect.height * 0.48, flowLines.length * lineHeight + flowPadding * 2);
     contentHeight -= flowHeight;
@@ -682,9 +682,9 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     ctx.lineTo(rect.x + rect.width, flowY);
     ctx.stroke();
     ctx.fillStyle = "#111827";
-    ctx.font = `800 ${20 * scale}px ${canvasFontFamily}`;
+    ctx.font = `800 ${18 * scale}px ${canvasFontFamily}`;
     ctx.textBaseline = "top";
-    drawWrappedText(ctx, song.flow, rect.x + 10 * scale, flowY + 8 * scale, rect.width - 20 * scale, 26 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (26 * scale))));
+    drawWrappedText(ctx, song.flow, rect.x + 10 * scale, flowY + 8 * scale, rect.width - 20 * scale, 23 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (23 * scale))));
   }
 
   ctx.restore();
