@@ -189,6 +189,16 @@ function getSongPages() {
   return pages;
 }
 
+let isPrinting = false;
+
+function usesMobileSheetPreview() {
+  if (isPrinting) return false;
+  if (document.documentElement.classList.contains("force-desktop")) return false;
+  const isPhoneOrNarrowTablet = window.matchMedia("(max-width: 1180px)").matches;
+  const isLargeTouchTablet = navigator.maxTouchPoints > 1 && window.matchMedia("(max-width: 1366px)").matches;
+  return isPhoneOrNarrowTablet || isLargeTouchTablet;
+}
+
 function saveSnapshot() {
   const serializable = {
     ...state,
@@ -488,12 +498,11 @@ function renderMarkers(song) {
     .join("");
 }
 
-function renderPreview() {
-  updatePrintPageRule();
+function renderA3Preview() {
   const perPage = state.layout.songsPerPage;
   const pages = getSongPages();
 
-  els.previewCanvas.innerHTML = pages
+  return pages
     .map(
       (songs) => `
         <div class="a3-page ${state.layout.orientation} ${state.layout.marginMode}">
@@ -505,11 +514,37 @@ function renderPreview() {
       `,
     )
     .join("");
+}
+
+function renderMobileSheetPreview() {
+  return state.songs
+    .map(
+      (song) => `
+        <div class="mobile-preview-page">
+          <div class="mobile-preview-page-heading">
+            <span>${escapeHtml(getPageHeading() || "출력 미리보기")}</span>
+            <strong>${song.order} / ${state.songs.length}</strong>
+          </div>
+          ${renderSlot(song)}
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderPreview(options = {}) {
+  updatePrintPageRule();
+  const perPage = state.layout.songsPerPage;
+  const mobilePreview = !options.forceA3 && usesMobileSheetPreview();
+
+  els.previewCanvas.classList.toggle("mobile-preview-canvas", mobilePreview);
+  els.previewCanvas.innerHTML = mobilePreview ? renderMobileSheetPreview() : renderA3Preview();
 
   const hasSmallWarning = perPage === 4 || state.songs.some((song) => getFile(song)?.type === "application/pdf");
-  els.warningBox.hidden = !hasSmallWarning;
-  els.warningBox.textContent =
-    "현재 설정은 악보가 작게 보일 수 있어요. 코드가 복잡한 곡은 A3 1장에 2곡 배치를 추천합니다.";
+  els.warningBox.hidden = !mobilePreview && !hasSmallWarning;
+  els.warningBox.textContent = mobilePreview
+    ? "편집용 한 장 보기입니다. PDF/JPG는 설정한 A3 배치로 저장됩니다."
+    : "현재 설정은 악보가 작게 보일 수 있어요. 코드가 복잡한 곡은 A3 1장에 2곡 배치를 추천합니다.";
 
   els.fileNameHint.textContent = getPdfFileName();
 }
@@ -922,11 +957,13 @@ function updatePrintPageRule() {
 function printWithSetlistTitle() {
   const originalTitle = document.title;
   document.title = getCleanSetlistTitle();
+  // The global afterprint handler clears isPrinting and re-renders the preview.
   const restoreTitle = () => {
     document.title = originalTitle;
     window.removeEventListener("afterprint", restoreTitle);
   };
   window.addEventListener("afterprint", restoreTitle);
+  isPrinting = true;
   window.print();
 }
 
@@ -1089,7 +1126,7 @@ function bindEvents() {
     alert("현재 콘티가 이 브라우저에 저장되었습니다.");
   });
   document.querySelector("#printButton").addEventListener("click", () => {
-    renderPreview();
+    renderPreview({ forceA3: true });
     printWithSetlistTitle();
   });
   document.querySelector("#jpgButton").addEventListener("click", () => {
@@ -1303,6 +1340,24 @@ function bindEvents() {
     }
   });
 
+  window.addEventListener("resize", () => {
+    if (isPrinting) return;
+    renderPreview();
+  });
+
+  // Printing from the browser menu skips the in-app button, so the canvas can
+  // still be holding the one-sheet mobile preview. Force the A3 pages first.
+  window.addEventListener("beforeprint", () => {
+    if (isPrinting) return;
+    isPrinting = true;
+    renderPreview({ forceA3: true });
+  });
+
+  window.addEventListener("afterprint", () => {
+    if (!isPrinting) return;
+    isPrinting = false;
+    renderPreview();
+  });
 }
 
 function boot() {
