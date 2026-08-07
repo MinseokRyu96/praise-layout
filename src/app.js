@@ -142,6 +142,10 @@ function ensureSongCount(count) {
   }));
 }
 
+function hasSongContent(song) {
+  return Boolean(song.title || song.key || song.modulationKey || song.flow || song.fileId || getSongMarkers(song).length);
+}
+
 function applySingleSongLayout() {
   if (state.setlist.songCount !== 1) return;
   state.layout.songsPerPage = 1;
@@ -1103,7 +1107,13 @@ function bindEvents() {
   });
 
   els.songCount.addEventListener("change", (event) => {
-    state.setlist.songCount = Number(event.target.value);
+    const nextCount = Number(event.target.value);
+    const dropped = state.songs.slice(nextCount).filter(hasSongContent);
+    if (dropped.length && !confirm(`${dropped.length}곡의 입력 내용이 삭제됩니다. 계속할까요?`)) {
+      event.target.value = String(state.setlist.songCount);
+      return;
+    }
+    state.setlist.songCount = nextCount;
     ensureSongCount(state.setlist.songCount);
     applySingleSongLayout();
     render();
