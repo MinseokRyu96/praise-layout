@@ -23,6 +23,7 @@ const state = {
   },
   songs: [],
   files: [],
+  placeholdersMigrated: false,
 };
 
 function notifyVisit() {
@@ -213,6 +214,8 @@ function saveSnapshot() {
 
 function loadSnapshot() {
   const raw = localStorage.getItem(storageKey);
+  // A fresh install has no legacy placeholders to clean up.
+  state.placeholdersMigrated = true;
   if (!raw) return;
   try {
     const saved = JSON.parse(raw);
@@ -220,7 +223,10 @@ function loadSnapshot() {
     Object.assign(state.layout, saved.layout || {});
     state.songs = Array.isArray(saved.songs) ? saved.songs : [];
     state.files = Array.isArray(saved.files) ? saved.files : [];
-    migratePlaceholderDefaults();
+    // One-shot cleanup of the old seeded placeholders. Running it on every load
+    // erased real titles too, since the samples are common worship songs.
+    if (saved.placeholdersMigrated !== true) migratePlaceholderDefaults();
+    state.placeholdersMigrated = true;
   } catch {
     localStorage.removeItem(storageKey);
   }
