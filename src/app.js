@@ -1329,7 +1329,10 @@ function bindEvents() {
         song[event.target.dataset.field] = normalizeKeyName(song[event.target.dataset.field]);
       }
       if (song.title && song.key) rememberSongKey(song.title, song.key, song.modulationKey);
-      render();
+      // Re-rendering the song list here would replace the select the user just
+      // used, dropping focus to <body> and breaking tab order mid-form.
+      renderPreview();
+      saveSnapshot();
       return;
     }
 
