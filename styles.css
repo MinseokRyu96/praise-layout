@@ -1754,7 +1754,9 @@ textarea {
 
   .flow-field textarea {
     min-height: 92px;
-    font-size: 14px;
+    /* Held at 16px: iOS Safari zooms the page in when a focused field is
+       smaller than that. The preview flow text still drops to 14px. */
+    font-size: 16px;
   }
 
   .upload-panel {
