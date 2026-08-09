@@ -23,8 +23,14 @@ function serveFile(req, res) {
   const safePath = path.normalize(decodeURIComponent(requestedPath)).replace(/^(\.\.[/\\])+/, "");
   let filePath = path.join(root, safePath === "/" ? "index.html" : safePath);
 
-  if (!path.extname(filePath) && !fs.existsSync(filePath) && fs.existsSync(`${filePath}.html`)) {
-    filePath = `${filePath}.html`;
+  // Mirror Vercel's cleanUrls: /blog resolves to blog/index.html and /about to
+  // about.html, so local previews match what ships.
+  if (!path.extname(filePath)) {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+      filePath = path.join(filePath, "index.html");
+    } else if (!fs.existsSync(filePath) && fs.existsSync(`${filePath}.html`)) {
+      filePath = `${filePath}.html`;
+    }
   }
 
   if (!filePath.startsWith(root)) {

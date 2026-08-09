@@ -7,7 +7,13 @@
     "build": "node scripts/build.js",
     "dev": "node server.js",
     "preview": "node server.js 4174",
-    "start": "node server.js"
+    "start": "node server.js",
+    "app:sync": "npm run build && npx cap sync",
+    "app:copy": "npm run build && npx cap copy",
+    "app:add:ios": "npx cap add ios",
+    "app:add:android": "npx cap add android",
+    "app:open:ios": "npx cap open ios",
+    "app:open:android": "npx cap open android"
   },
   "keywords": [
     "worship",
@@ -17,5 +23,14 @@
     "pdf"
   ],
   "author": "",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "marked": "^18.0.9"
+  }
 }

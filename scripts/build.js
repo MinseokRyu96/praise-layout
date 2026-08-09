@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { writeBlog, writeSitemap } = require("./blog");
 
 const root = path.join(__dirname, "..");
 const dist = path.join(root, "dist");
@@ -11,6 +12,8 @@ const entries = [
   "privacy.html",
   "terms.html",
   "contact.html",
+  "blog",
+  "favicon.svg",
   "ads.txt",
   "robots.txt",
   "sitemap.xml",
@@ -32,6 +35,12 @@ function copyEntry(source, target) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.copyFileSync(source, target);
 }
+
+// Blog pages and the sitemap are generated from content/blog, so regenerate
+// them before copying rather than shipping whatever was last committed.
+const posts = writeBlog();
+writeSitemap(posts);
+console.log(`Generated ${posts.length} blog page(s) and sitemap.xml`);
 
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(dist, { recursive: true });
