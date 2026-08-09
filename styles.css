@@ -519,6 +519,8 @@ textarea {
 
 .flow-field textarea {
   min-height: 118px;
+  /* Inherits 13px from .field-block; held 2px below that to match the preview. */
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -1136,7 +1138,7 @@ textarea {
   border-top: 1px solid #edf0f5;
   background: #fbfcfe;
   color: #111827;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.3;
   white-space: pre-wrap;
@@ -1752,6 +1754,7 @@ textarea {
 
   .flow-field textarea {
     min-height: 92px;
+    font-size: 14px;
   }
 
   .upload-panel {
@@ -1910,7 +1913,7 @@ textarea {
   .slot-flow {
     max-height: none;
     overflow: visible;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.35;
   }
 
@@ -2239,7 +2242,7 @@ html.force-desktop .footer-links a {
     max-height: var(--flow-max-height, 30%) !important;
     overflow: hidden !important;
     padding: 2mm 3mm;
-    font-size: 18px !important;
+    font-size: 16px !important;
     line-height: 1.3 !important;
   }
 
