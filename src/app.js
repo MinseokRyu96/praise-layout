@@ -321,6 +321,18 @@ async function restoreStoredFileObjectUrls() {
     didRestore = true;
   }
 
+  // Sheets saved before markers were pinned to the image have no dimensions.
+  // Backfill them so existing setlists get the corrected marker placement too.
+  for (const file of state.files) {
+    const source = getFileSource(file);
+    if (!source || (file.width && file.height)) continue;
+    const size = await readImageSize(source);
+    if (!size) continue;
+    file.width = size.width;
+    file.height = size.height;
+    didRestore = true;
+  }
+
   return didRestore;
 }
 
@@ -470,6 +482,12 @@ function getSongMarkers(song) {
 
 function getMarkerSize(marker) {
   return Math.max(0.7, Math.min(2.4, Number(marker?.size || 1)));
+}
+
+// Width / height of the sheet image. Drives the stage box the markers sit on.
+function getSheetAspect(file) {
+  if (!file || !getFileSource(file) || !file.width || !file.height) return "";
+  return (file.width / file.height).toFixed(6);
 }
 
 function renderMarkerControls(song) {
@@ -715,7 +733,9 @@ async function drawJpgSlot(ctx, song, rect, scale) {
     height: contentHeight - bodyPadding * 2,
   };
   await drawSheetImage(ctx, song, frame, scale);
-  drawSheetMarkers(ctx, song, frame, scale);
+  // Markers ride on the sheet, not on the frame around it.
+  const file = getFile(song);
+  drawSheetMarkers(ctx, song, getContainBox(frame, file?.width, file?.height));
 
   if (hasFlow) {
     const flowY = rect.y + rect.height - flowHeight;
@@ -752,15 +772,18 @@ async function drawSheetImage(ctx, song, frame, scale) {
   drawFallbackSheet(ctx, frame, scale);
 }
 
-function drawSheetMarkers(ctx, song, frame, scale) {
+function drawSheetMarkers(ctx, song, sheet) {
+  // Same geometry as the preview: 3.4% of the sheet's short side per unit of
+  // marker size, with the box derived from that font size.
+  const markerScale = Math.min(sheet.width, sheet.height) * 0.034;
   getSongMarkers(song).forEach((marker) => {
-    const x = frame.x + frame.width * Number(marker.x || 0);
-    const y = frame.y + frame.height * Number(marker.y || 0);
+    const x = sheet.x + sheet.width * Number(marker.x || 0);
+    const y = sheet.y + sheet.height * Number(marker.y || 0);
     const markerSize = getMarkerSize(marker);
-    const fontSize = 14 * markerSize * scale;
-    const paddingX = 6 * markerSize * scale;
-    const paddingY = 4 * markerSize * scale;
-    const radius = 5 * markerSize * scale;
+    const fontSize = markerScale * markerSize;
+    const paddingX = fontSize * 0.54;
+    const paddingY = fontSize * 0.23;
+    const radius = fontSize * 0.54;
     const label = String(marker.label || "");
     if (!label) return;
 
@@ -769,8 +792,8 @@ function drawSheetMarkers(ctx, song, frame, scale) {
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     const textWidth = ctx.measureText(label).width;
-    const width = textWidth + paddingX * 2;
-    const height = fontSize + paddingY * 2;
+    const width = Math.max(textWidth + paddingX * 2, fontSize * 2);
+    const height = Math.max(fontSize + paddingY * 2, fontSize * 1.85);
     const left = x - width / 2;
     const top = y - height / 2;
 
@@ -778,10 +801,10 @@ function drawSheetMarkers(ctx, song, frame, scale) {
     ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
     ctx.fill();
     ctx.strokeStyle = "#111827";
-    ctx.lineWidth = Math.max(1, 1.3 * scale);
+    ctx.lineWidth = Math.max(1, fontSize * 0.115);
     ctx.stroke();
     ctx.fillStyle = "#111827";
-    ctx.fillText(label, x, y + 0.5 * scale);
+    ctx.fillText(label, x, y);
     ctx.restore();
   });
 }
@@ -909,6 +932,31 @@ function loadImage(src) {
   });
 }
 
+async function readImageSize(src) {
+  try {
+    const image = await loadImage(src);
+    if (!image.naturalWidth || !image.naturalHeight) return null;
+    return { width: image.naturalWidth, height: image.naturalHeight };
+  } catch {
+    return null;
+  }
+}
+
+// The sheet is drawn with object-fit: contain, so it only fills part of the
+// frame. Markers are stored as a fraction of the sheet, not of the frame.
+function getContainBox(frame, naturalWidth, naturalHeight) {
+  if (!naturalWidth || !naturalHeight) return frame;
+  const ratio = Math.min(frame.width / naturalWidth, frame.height / naturalHeight);
+  const width = naturalWidth * ratio;
+  const height = naturalHeight * ratio;
+  return {
+    x: frame.x + (frame.width - width) / 2,
+    y: frame.y + (frame.height - height) / 2,
+    width,
+    height,
+  };
+}
+
 function canvasToJpgBlob(canvas) {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
@@ -987,9 +1035,11 @@ function renderSlot(song) {
         ${renderMarkerControls(song)}
       </div>
       <div class="slot-body">
-        <div class="sheet-frame" data-action="marker-place" data-song-id="${song.id}">
-          ${getFileSource(file) ? `<img src="${escapeHtml(getFileSource(file))}" alt="${escapeHtml(song.title)} 악보" />` : '<div class="fallback-sheet" aria-label="악보 자리"></div>'}
-          <div class="sheet-marker-layer">${renderMarkers(song)}</div>
+        <div class="sheet-frame">
+          <div class="sheet-stage${getSheetAspect(file) ? "" : " is-empty"}"${getSheetAspect(file) ? ` style="--sheet-ar: ${getSheetAspect(file)}"` : ""}>
+            ${getFileSource(file) ? `<img src="${escapeHtml(getFileSource(file))}" alt="${escapeHtml(song.title)} 악보" />` : '<div class="fallback-sheet" aria-label="악보 자리"></div>'}
+            <div class="sheet-marker-layer" data-action="marker-place" data-song-id="${song.id}">${renderMarkers(song)}</div>
+          </div>
         </div>
       </div>
       ${hasFlow ? `<div class="slot-flow">${escapeHtml(song.flow)}</div>` : ""}
@@ -1071,6 +1121,15 @@ async function handleFileList(fileList, songId = "") {
       size: file.size,
       objectUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
     };
+    // Markers are pinned to the sheet image, so the preview needs its aspect
+    // ratio to overlay the marker layer exactly on the rendered image.
+    if (item.objectUrl) {
+      const size = await readImageSize(item.objectUrl);
+      if (size) {
+        item.width = size.width;
+        item.height = size.height;
+      }
+    }
     try {
       await storeFileBlob(item, file);
     } catch {
