@@ -998,8 +998,8 @@ function blobToBase64(blob) {
   });
 }
 
-async function shareFilesNatively(downloads) {
-  const { Filesystem, Share } = window.Capacitor.Plugins;
+async function writeToCache(downloads) {
+  const { Filesystem } = window.Capacitor.Plugins;
   const uris = [];
 
   for (const { blob, fileName } of downloads) {
@@ -1012,11 +1012,40 @@ async function shareFilesNatively(downloads) {
     uris.push(written.uri);
   }
 
-  await Share.share({ title: getCleanSetlistTitle(), files: uris });
+  return uris;
+}
+
+async function shareFilesNatively(downloads) {
+  const { Share } = window.Capacitor.Plugins;
+  await Share.share({ title: getCleanSetlistTitle(), files: await writeToCache(downloads) });
+}
+
+// Saving straight to the photo library is what "download" means on an iPad, so
+// images skip the share sheet entirely. Without an album identifier the plugin
+// asks for add-only access, which is all this needs.
+async function saveImagesToPhotos(downloads) {
+  const { Media } = window.Capacitor.Plugins;
+  for (const uri of await writeToCache(downloads)) {
+    await Media.savePhoto({ path: uri });
+  }
 }
 
 async function downloadBlobSequence(downloads) {
   if (isNativeApp()) {
+    const allImages = downloads.every(({ blob }) => blob.type.startsWith("image/"));
+
+    if (allImages) {
+      try {
+        await saveImagesToPhotos(downloads);
+        alert(`사진 앱에 ${downloads.length}장 저장했습니다.`);
+        return;
+      } catch (error) {
+        // Usually a denied photo permission. The share sheet still lets the
+        // user put the file somewhere, so offer it rather than dead-ending.
+        alert("사진 앱에 저장하지 못했습니다. 저장 위치를 직접 선택해 주세요.");
+      }
+    }
+
     try {
       await shareFilesNatively(downloads);
     } catch (error) {
@@ -1628,11 +1657,24 @@ function bindEvents() {
   });
 }
 
+// In the app the JPG button writes to the photo library rather than the
+// downloads folder, so it says so.
+function applyNativeLabels() {
+  if (!isNativeApp()) return;
+  const button = document.querySelector("#jpgButton");
+  if (!button) return;
+  const desktop = button.querySelector(".desktop-label");
+  const mobile = button.querySelector(".mobile-label");
+  if (desktop) desktop.textContent = "사진으로 저장";
+  if (mobile) mobile.textContent = "사진";
+}
+
 function boot() {
   notifyVisit();
   loadSnapshot();
   ensureSongCount(state.setlist.songCount);
   applySingleSongLayout();
+  applyNativeLabels();
   bindEvents();
   render();
   restoreStoredFileObjectUrls()

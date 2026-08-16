@@ -27,6 +27,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "@capacitor-community/media": "^9.1.0",
     "@capacitor/android": "^8.0.0",
     "@capacitor/core": "^8.0.0",
     "@capacitor/filesystem": "^8.1.2",
