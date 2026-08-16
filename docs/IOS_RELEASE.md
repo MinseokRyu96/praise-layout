@@ -55,14 +55,17 @@ against `sdk=iphoneos*` is pinned to the distribution certificate and profile.
 
 ## Signing
 
-The certificate and provisioning profile were created through the App Store Connect API
-rather than by signing in to Xcode, so no Apple ID is attached to this machine's Xcode.
+No Apple ID is attached to this machine's Xcode. Signing uses the account's single
+distribution certificate, which was originally created by EAS for the other app on this
+account; the profile below was issued through the App Store Connect API.
 
 - Distribution certificate lives in the login keychain (`security find-identity -v -p codesigning`).
-- Profile `Conti Note App Store` (`c7fe1475-0782-4c8a-94b8-ce5a96ad2245`) is installed under
+  Its private key is also held by EAS, so it can be re-downloaded with `eas credentials`.
+- Profile `Conti Note App Store` (`79387ffb-36fe-4af4-9e04-22546f3121a4`) is installed under
   `~/Library/MobileDevice/Provisioning Profiles/`.
-- Both expire **2027-08-16**. Renewing means issuing a new certificate and profile, then
-  reinstalling them — the profile name in the build settings can stay the same.
+- Certificate expires **2027-08-09**. Apple caps distribution certificates at a small number,
+  so reuse this one rather than issuing another; renewing means a new certificate plus a new
+  profile, and the profile name in the build settings can stay the same.
 
 A machine without those two artifacts cannot produce a Release device build. Either import
 the `.p12` backup and the profile, or sign in to Xcode and switch Release back to automatic.
