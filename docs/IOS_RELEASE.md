@@ -47,15 +47,35 @@ A3 PDF 저장과 페이지별 JPG 저장을 지원해 리허설 공유, 출력, 
 | Required capabilities | `arm64` |
 | Encryption | `ITSAppUsesNonExemptEncryption = false` |
 | Version / Build | 1.0 / 1 |
+| Team | `77WL78RTS8` (Minseok Ryu) |
+| Release signing | Manual — `iPhone Distribution`, profile `Conti Note App Store` |
 
-## Manual Steps Before Upload
+Debug stays on automatic signing so simulator builds need no credentials; only Release
+against `sdk=iphoneos*` is pinned to the distribution certificate and profile.
 
-1. Set the Apple Developer Team under Signing & Capabilities in Xcode.
-2. Create the App Store Connect record with Bundle ID `com.praiselayout.app`.
-3. Capture iPad screenshots (13" and 11" required sizes) from the latest build.
-4. Archive and upload via Xcode Organizer or Transporter.
-5. Fill App Privacy and export compliance answers.
-6. Test through TestFlight before submitting for review.
+## Signing
+
+The certificate and provisioning profile were created through the App Store Connect API
+rather than by signing in to Xcode, so no Apple ID is attached to this machine's Xcode.
+
+- Distribution certificate lives in the login keychain (`security find-identity -v -p codesigning`).
+- Profile `Conti Note App Store` (`c7fe1475-0782-4c8a-94b8-ce5a96ad2245`) is installed under
+  `~/Library/MobileDevice/Provisioning Profiles/`.
+- Both expire **2027-08-16**. Renewing means issuing a new certificate and profile, then
+  reinstalling them — the profile name in the build settings can stay the same.
+
+A machine without those two artifacts cannot produce a Release device build. Either import
+the `.p12` backup and the profile, or sign in to Xcode and switch Release back to automatic.
+
+
+## Remaining Manual Steps
+
+1. Capture iPad screenshots (13" and 11" required sizes) from the latest build.
+2. Fill App Privacy and export compliance answers.
+3. Test through TestFlight before submitting for review.
+
+The App Store Connect record already exists (`콘티노트`, SKU `20260816-01`), and the archive,
+export, and upload steps are scripted — see the verification checklist below.
 
 App Review rejects thin website wrappers, so the listing and screenshots should lead with offline editing, local file persistence, on-sheet markers, and A3 PDF/JPG export.
 
@@ -65,5 +85,21 @@ App Review rejects thin website wrappers, so the listing and screenshots should 
 npm run build
 npm run app:sync
 plutil -lint ios/App/App/Info.plist ios/App/App/PrivacyInfo.xcprivacy
-npm run app:build:ios
+npm run app:build:ios                     # simulator SDK, no signing needed
+security find-identity -v -p codesigning  # must list the distribution identity
 ```
+
+Release device build, archive, export, and validation:
+
+```bash
+xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+  -destination 'generic/platform=iOS' -archivePath build/ContiNote.xcarchive archive
+xcodebuild -exportArchive -archivePath build/ContiNote.xcarchive \
+  -exportOptionsPlist build/ExportOptions.plist -exportPath build/export
+API_PRIVATE_KEYS_DIR=<dir holding AuthKey_*.p8> \
+  xcrun altool --validate-app -f build/export/App.ipa -t ios \
+  --apiKey <key id> --apiIssuer <issuer id>
+```
+
+Swap `--validate-app` for `--upload-app` to send the build to TestFlight. The App Store
+Connect API key is a team-wide credential — keep it out of the repo.
