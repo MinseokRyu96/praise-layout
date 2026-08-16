@@ -7,3 +7,19 @@ dist/
 
 # Capacitor's generated iOS artifacts are ignored by ios/.gitignore.
 *.xcuserstate
+
+# This repository is public. iOS release work puts signing material on disk
+# next to the source, so refuse to track any of it by name rather than relying
+# on remembering. Nothing here is currently committed and nothing should be.
+*.p8
+*.p12
+*.pem
+*.pfx
+*.cer
+*.mobileprovision
+*.keystore
+*.jks
+id_rsa*
+credentials.json
+.npmrc
+.netrc
