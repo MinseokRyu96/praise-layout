@@ -619,7 +619,7 @@ async function renderJpgCanvas(songs) {
   const gap = 10 * scale;
   const headingHeight = 28 * scale;
 
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = exportPalette.surface;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   drawJpgPageHeading(ctx, canvas.width, margin, headingHeight, scale);
 
@@ -642,7 +642,7 @@ function getCanvasMargin(scale) {
 
 function drawJpgPageHeading(ctx, width, margin, height, scale) {
   ctx.save();
-  ctx.fillStyle = "#182230";
+  ctx.fillStyle = exportPalette.textPrimary;
   ctx.font = `900 ${12 * scale}px ${canvasFontFamily}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -688,8 +688,8 @@ function getSlotRects(width, height, count, margin, gap, headingHeight = 0) {
 
 async function drawJpgSlot(ctx, song, rect, scale) {
   ctx.save();
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#dfe5ee";
+  ctx.fillStyle = exportPalette.surface;
+  ctx.strokeStyle = exportPalette.borderDefault;
   ctx.lineWidth = Math.max(1, scale);
   ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
   ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -699,14 +699,14 @@ async function drawJpgSlot(ctx, song, rect, scale) {
 
   if (state.layout.showMeta) {
     const metaHeight = 32 * scale;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = exportPalette.surface;
     ctx.fillRect(rect.x, rect.y, rect.width, metaHeight);
-    ctx.strokeStyle = "#edf0f5";
+    ctx.strokeStyle = exportPalette.borderSubtle;
     ctx.beginPath();
     ctx.moveTo(rect.x, rect.y + metaHeight);
     ctx.lineTo(rect.x + rect.width, rect.y + metaHeight);
     ctx.stroke();
-    ctx.fillStyle = "#182230";
+    ctx.fillStyle = exportPalette.textPrimary;
     ctx.font = `900 ${13 * scale}px ${canvasFontFamily}`;
     ctx.textBaseline = "middle";
     drawClampedLine(ctx, getSongLabel(song), rect.x + 9 * scale, rect.y + metaHeight / 2, rect.width - 18 * scale);
@@ -739,14 +739,14 @@ async function drawJpgSlot(ctx, song, rect, scale) {
 
   if (hasFlow) {
     const flowY = rect.y + rect.height - flowHeight;
-    ctx.fillStyle = "#fbfcfe";
+    ctx.fillStyle = exportPalette.subtle;
     ctx.fillRect(rect.x, flowY, rect.width, flowHeight);
-    ctx.strokeStyle = "#edf0f5";
+    ctx.strokeStyle = exportPalette.borderSubtle;
     ctx.beginPath();
     ctx.moveTo(rect.x, flowY);
     ctx.lineTo(rect.x + rect.width, flowY);
     ctx.stroke();
-    ctx.fillStyle = "#111827";
+    ctx.fillStyle = exportPalette.textPrimary;
     ctx.font = `800 ${16 * scale}px ${canvasFontFamily}`;
     ctx.textBaseline = "top";
     drawWrappedText(ctx, song.flow, rect.x + 10 * scale, flowY + 8 * scale, rect.width - 20 * scale, 21 * scale, Math.max(1, Math.floor((flowHeight - 16 * scale) / (21 * scale))));
@@ -765,7 +765,7 @@ async function drawSheetImage(ctx, song, frame, scale) {
   }
 
   if (file?.type === "application/pdf") {
-    drawCenteredPlaceholder(ctx, `PDF\n${file.name}`, frame, "#bc3b55", scale);
+    drawCenteredPlaceholder(ctx, `PDF\n${file.name}`, frame, exportPalette.danger, scale);
     return;
   }
 
@@ -800,10 +800,10 @@ function drawSheetMarkers(ctx, song, sheet) {
     drawRoundRect(ctx, left, top, width, height, radius);
     ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
     ctx.fill();
-    ctx.strokeStyle = "#111827";
+    ctx.strokeStyle = exportPalette.textPrimary;
     ctx.lineWidth = Math.max(1, fontSize * 0.115);
     ctx.stroke();
-    ctx.fillStyle = "#111827";
+    ctx.fillStyle = exportPalette.textPrimary;
     ctx.fillText(label, x, y);
     ctx.restore();
   });
@@ -839,13 +839,13 @@ function drawFallbackSheet(ctx, frame, scale) {
   const width = frame.width - insetX * 2;
   const height = frame.height - insetY * 2;
 
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = exportPalette.surface;
   ctx.fillRect(x, y, width, height);
-  ctx.strokeStyle = "#d5dce7";
+  ctx.strokeStyle = exportPalette.borderHover;
   ctx.lineWidth = Math.max(1, scale);
   ctx.strokeRect(x, y, width, height);
 
-  ctx.strokeStyle = "#eef2f6";
+  ctx.strokeStyle = exportPalette.borderSubtle;
   ctx.lineWidth = Math.max(1, scale);
   for (let lineY = y + 18 * scale; lineY < y + height; lineY += 18 * scale) {
     ctx.beginPath();
@@ -956,6 +956,18 @@ function getContainBox(frame, naturalWidth, naturalHeight) {
     height,
   };
 }
+
+// Export canvases cannot read CSS variables, so the design system tokens the
+// renderer needs are mirrored here. Keep these in step with :root in styles.css.
+const exportPalette = {
+  surface: "#ffffff",
+  subtle: "#fbfcfe",
+  borderDefault: "#e3e8ef",
+  borderHover: "#c8d2df",
+  borderSubtle: "#eef2f6",
+  textPrimary: "#182230",
+  danger: "#bc3b55",
+};
 
 function canvasToJpgBlob(canvas) {
   return new Promise((resolve, reject) => {
