@@ -4,3 +4,6 @@ dist/
 .env
 .env.*
 .gstack/
+
+# Capacitor's generated iOS artifacts are ignored by ios/.gitignore.
+*.xcuserstate

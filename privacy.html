@@ -17,11 +17,18 @@
     <meta property="og:url" content="https://praise-layout.vercel.app/privacy" />
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#0f766e" />
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8104838143348148"
-      crossorigin="anonymous"
-    ></script>
+    <script>
+      (() => {
+        const adSenseHosts = new Set(["praise-layout.vercel.app"]);
+        if (!adSenseHosts.has(window.location.hostname)) return;
+
+        const adScript = document.createElement("script");
+        adScript.async = true;
+        adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8104838143348148";
+        adScript.crossOrigin = "anonymous";
+        document.head.appendChild(adScript);
+      })();
+    </script>
     <link rel="stylesheet" href="./styles.css?v=67" />
   </head>
   <body class="content-page">

@@ -11,6 +11,7 @@ PraiseLayout is a static web app for Korean worship teams to create praise setli
 - Build output: `dist/`.
 - Build command: `npm run build`.
 - Local server: `node server.js 4175`.
+- iPad app: Capacitor wrapper in `ios/`, config in `capacitor.config.json`. See `docs/APP.md`.
 
 ## Workflow
 
@@ -44,6 +45,8 @@ PraiseLayout is a static web app for Korean worship teams to create praise setli
 - GitHub `main` push triggers Vercel deployment.
 - Update cache query strings when changing `styles.css` or `src/app.js`.
 - Keep AdSense, `ads.txt`, `robots.txt`, and `sitemap.xml` intact.
+- Every page must gate the AdSense script on the `praise-layout.vercel.app` hostname so it never loads in the iPad app WebView.
+- After changing web assets, run `npm run app:sync` so the iPad build picks them up.
 - Contact email is `mean.seokk@gmail.com`.
 
 ## Done When

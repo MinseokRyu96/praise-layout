@@ -1,0 +1,11 @@
+{
+  "appId": "com.praiselayout.app",
+  "appName": "콘티노트",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}
