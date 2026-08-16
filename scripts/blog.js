@@ -6,7 +6,7 @@ const root = path.join(__dirname, "..");
 const postsDir = path.join(root, "content", "blog");
 const outDir = path.join(root, "blog");
 const siteUrl = "https://praise-layout.vercel.app";
-const styleVersion = "67";
+const styleVersion = "68";
 
 // Front matter is a flat "key: value" block; no nested YAML is used or supported.
 function parseFrontMatter(raw) {

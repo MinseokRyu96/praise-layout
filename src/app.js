@@ -970,7 +970,50 @@ function downloadBlob(blob, fileName) {
   return downloadBlobSequence([{ blob, fileName }]);
 }
 
+// The iPad app runs in a WKWebView, which ignores <a download> and refuses to
+// navigate to blob: URLs, so the browser download path silently does nothing
+// there. Write the files out and hand them to the share sheet instead.
+function isNativeApp() {
+  return Boolean(window.Capacitor?.isNativePlatform?.());
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read the generated file."));
+    reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function shareFilesNatively(downloads) {
+  const { Filesystem, Share } = window.Capacitor.Plugins;
+  const uris = [];
+
+  for (const { blob, fileName } of downloads) {
+    const written = await Filesystem.writeFile({
+      path: fileName,
+      data: await blobToBase64(blob),
+      directory: "CACHE",
+      recursive: true,
+    });
+    uris.push(written.uri);
+  }
+
+  await Share.share({ title: getCleanSetlistTitle(), files: uris });
+}
+
 async function downloadBlobSequence(downloads) {
+  if (isNativeApp()) {
+    try {
+      await shareFilesNatively(downloads);
+    } catch (error) {
+      // Dismissing the share sheet rejects too, so only surface real failures.
+      if (!/cancel/i.test(error?.message ?? "")) throw error;
+    }
+    return;
+  }
+
   const items = downloads.map(({ blob, fileName }) => ({
     fileName,
     url: URL.createObjectURL(blob),
@@ -1000,6 +1043,137 @@ function wait(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+// WKWebView does not implement window.print(), so the browser's print-to-PDF
+// route is unavailable in the iPad app. Assemble an A3 PDF from the same page
+// canvases the JPG export uses: each JPEG goes in as a DCTDecode image that
+// covers a full A3 page.
+const A3_SHORT_PT = 841.89;
+const A3_LONG_PT = 1190.55;
+
+// PDF literal strings cannot carry Hangul, so metadata goes in as a UTF-16BE
+// hex string with a byte order mark.
+function pdfTextString(text) {
+  const bytes = [0xfe, 0xff];
+  for (const character of String(text)) {
+    const code = character.codePointAt(0);
+    if (code > 0xffff) {
+      const offset = code - 0x10000;
+      const high = 0xd800 + (offset >> 10);
+      const low = 0xdc00 + (offset & 0x3ff);
+      bytes.push(high >> 8, high & 0xff, low >> 8, low & 0xff);
+    } else {
+      bytes.push(code >> 8, code & 0xff);
+    }
+  }
+  return `<${bytes.map((byte) => byte.toString(16).padStart(2, "0")).join("")}>`;
+}
+
+function buildJpegPdf(pages, { landscape, title }) {
+  const encoder = new TextEncoder();
+  const chunks = [];
+  let length = 0;
+  const push = (part) => {
+    const bytes = typeof part === "string" ? encoder.encode(part) : part;
+    chunks.push(bytes);
+    length += bytes.length;
+  };
+
+  const pageWidth = landscape ? A3_LONG_PT : A3_SHORT_PT;
+  const pageHeight = landscape ? A3_SHORT_PT : A3_LONG_PT;
+
+  // Object 1 catalog, 2 pages, 3 info, then three objects per page.
+  const offsets = [];
+  const objectCount = 3 + pages.length * 3;
+  const pageObjectId = (index) => 4 + index * 3;
+
+  const startObject = (id) => {
+    offsets[id] = length;
+    push(`${id} 0 obj\n`);
+  };
+
+  push("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+
+  startObject(1);
+  push("<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+
+  startObject(2);
+  const kids = pages.map((_, index) => `${pageObjectId(index)} 0 R`).join(" ");
+  push(`<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>\nendobj\n`);
+
+  startObject(3);
+  push(`<< /Title ${pdfTextString(title)} /Producer (PraiseLayout) >>\nendobj\n`);
+
+  pages.forEach((page, index) => {
+    const id = pageObjectId(index);
+    const contentId = id + 1;
+    const imageId = id + 2;
+
+    startObject(id);
+    push(
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth.toFixed(2)} ${pageHeight.toFixed(2)}]` +
+        ` /Resources << /XObject << /Im0 ${imageId} 0 R >> >> /Contents ${contentId} 0 R >>\nendobj\n`
+    );
+
+    const stream = `q ${pageWidth.toFixed(2)} 0 0 ${pageHeight.toFixed(2)} 0 0 cm /Im0 Do Q\n`;
+    startObject(contentId);
+    push(`<< /Length ${stream.length} >>\nstream\n${stream}endstream\nendobj\n`);
+
+    startObject(imageId);
+    push(
+      `<< /Type /XObject /Subtype /Image /Width ${page.width} /Height ${page.height}` +
+        ` /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${page.bytes.length} >>\nstream\n`
+    );
+    push(page.bytes);
+    push("\nendstream\nendobj\n");
+  });
+
+  const xrefOffset = length;
+  push(`xref\n0 ${objectCount + 1}\n0000000000 65535 f \n`);
+  for (let id = 1; id <= objectCount; id += 1) {
+    push(`${String(offsets[id]).padStart(10, "0")} 00000 n \n`);
+  }
+  push(
+    `trailer\n<< /Size ${objectCount + 1} /Root 1 0 R /Info 3 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`
+  );
+
+  return new Blob(chunks, { type: "application/pdf" });
+}
+
+async function exportPdfNatively() {
+  const button = document.querySelector("#printButton");
+  const originalContent = button.innerHTML;
+  button.disabled = true;
+  button.textContent = "PDF 생성 중";
+
+  try {
+    renderPreview({ forceA3: true });
+    await document.fonts?.ready?.catch(() => {});
+
+    const pages = [];
+    for (const songs of getSongPages()) {
+      const canvas = await renderJpgCanvas(songs);
+      const blob = await canvasToJpgBlob(canvas);
+      pages.push({
+        width: canvas.width,
+        height: canvas.height,
+        bytes: new Uint8Array(await blob.arrayBuffer()),
+      });
+    }
+
+    const pdf = buildJpegPdf(pages, {
+      landscape: state.layout.orientation !== "portrait",
+      title: getCleanSetlistTitle(),
+    });
+    await downloadBlob(pdf, getPdfFileName());
+  } catch (error) {
+    alert("PDF 파일을 만드는 중 문제가 발생했습니다. 악보 이미지를 다시 업로드한 뒤 시도해 주세요.");
+  } finally {
+    button.disabled = false;
+    button.innerHTML = originalContent;
+    renderPreview();
+  }
 }
 
 function updatePrintPageRule() {
@@ -1201,6 +1375,10 @@ function bindEvents() {
     alert("현재 콘티가 이 브라우저에 저장되었습니다.");
   });
   document.querySelector("#printButton").addEventListener("click", () => {
+    if (isNativeApp()) {
+      exportPdfNatively();
+      return;
+    }
     renderPreview({ forceA3: true });
     printWithSetlistTitle();
   });
