@@ -1657,10 +1657,15 @@ function bindEvents() {
   });
 }
 
-// In the app the JPG button writes to the photo library rather than the
-// downloads folder, so it says so.
-function applyNativeLabels() {
+// Differences that only apply inside the app. The class lets stylesheets opt
+// out of web-only chrome; this script runs before first paint, so nothing
+// flashes.
+function applyNativeChrome() {
   if (!isNativeApp()) return;
+  document.documentElement.classList.add("native-app");
+
+  // The JPG button writes to the photo library rather than a downloads
+  // folder, so it says so.
   const button = document.querySelector("#jpgButton");
   if (!button) return;
   const desktop = button.querySelector(".desktop-label");
@@ -1674,7 +1679,7 @@ function boot() {
   loadSnapshot();
   ensureSongCount(state.setlist.songCount);
   applySingleSongLayout();
-  applyNativeLabels();
+  applyNativeChrome();
   bindEvents();
   render();
   restoreStoredFileObjectUrls()

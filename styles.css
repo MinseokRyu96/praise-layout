@@ -187,6 +187,14 @@ a:focus-visible {
   padding: 0 26px 28px;
 }
 
+/* The footer is web-only. Its links point at clean URLs that only resolve
+   through the host's rewrite rules, so in the app WebView they 404 and appear
+   to do nothing, and the summary line beside them is search copy aimed at
+   people who have not installed the app yet. */
+.native-app .site-footer {
+  display: none;
+}
+
 .site-footer-inner {
   display: flex;
   align-items: center;
